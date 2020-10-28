@@ -1,0 +1,11 @@
+{
+  "type": "postgres",
+  "host": "localhost",
+  "port": 5432,
+  "user":"postgres",
+  "username": "postgres",
+  "password": "maotrix1",
+  "database": "selling-point",
+  "entities": ["dist/entities/**/*.js"],
+  "migrations": ["dist/migrations/*.js"]
+}
