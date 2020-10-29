@@ -1,24 +1,71 @@
-import { Button } from "antd";
 import { useRouter } from "next/router";
+import { Form, Input, Button, Checkbox } from "antd";
+import st from "../styles/auth.module.css";
+const layout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+const tailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
 
 const Login = () => {
-  const router = useRouter();
-  console.log(router);
+  const onFinish = (values) => {
+    console.log("Success:", values);
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
+
   return (
-    <div>
-      <h1>Login Page</h1>
-      <Button
-        onClick={() => {
-          const path = router.query?.next;
-          console.log(path);
-          if (typeof path === "string") router.push(path);
-          else router.push("/");
-        }}
+    <div className={st.authContainer}>
+      {/* <div style={{ width: "30%", height: "100%", backgroundColor: "white" }}>
+        Side
+      </div> */}
+
+      <Form
+        {...layout}
+        name="basic"
+        initialValues={{ remember: true }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
       >
-        Log In
-      </Button>
+        <Form.Item
+          label="Username"
+          name="username"
+          rules={[{ required: true, message: "Please input your username!" }]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[{ required: true, message: "Please input your password!" }]}
+        >
+          <Input.Password />
+        </Form.Item>
+
+        <Form.Item {...tailLayout} name="remember" valuePropName="checked">
+          <Checkbox>Remember me</Checkbox>
+        </Form.Item>
+
+        <Form.Item {...tailLayout}>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 };
 
 export default Login;
+
+// onClick={() => {
+//   const path = router.query?.next;
+//   console.log(path);
+//   if (typeof path === "string") router.push(path);
+//   else router.push("/");
+// }}
