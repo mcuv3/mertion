@@ -18,7 +18,7 @@ import {
 import path from "path";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
-import { Auth } from "./resolvers/me";
+import { Auth } from "./resolvers/Auth";
 import { User } from "./entities/index";
 
 const main = async () => {
@@ -33,6 +33,10 @@ const main = async () => {
   });
 
   const app = express();
+  app.use(
+    "/profile-pictures",
+    express.static(path.join(__dirname, "public", "profile-pictures"))
+  );
 
   const RedisStore = connectRedis(session);
   const redis = new Redis(REDIS_URL);

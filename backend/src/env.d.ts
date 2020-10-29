@@ -7,3 +7,13 @@ declare namespace NodeJS {
     ORIGIN: string;
   }
 }
+
+declare namespace Express {
+  export interface Request {
+    isAuth: boolean;
+    user: {
+      email: string;
+      role: string;
+    };
+  }
+}
