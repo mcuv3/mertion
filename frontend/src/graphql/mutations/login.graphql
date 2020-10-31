@@ -1,0 +1,10 @@
+mutation Login($email: String!, $password: String!) {
+  logIn(fields: { email: $email, password: $password }) {
+    success
+    message
+    errors {
+      field
+      error
+    }
+  }
+}

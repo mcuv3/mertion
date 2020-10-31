@@ -1,8 +1,18 @@
 import { Form, Input, InputNumber, Button, Upload } from "antd";
 import { beforeUpload, getBase64 } from "../validation/validation";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-import st from "../styles/auth.module.css";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { withApollo } from "../lib/withApollo";
+import { useForm } from "antd/lib/form/Form";
+import { UploadChangeParam } from "antd/lib/upload";
+import { UploadFile } from "antd/lib/upload/interface";
+import {
+  SignUpMutationVariables,
+  useSignUpMutation,
+} from "../generated/graphql";
+import { useRouter } from "next/router";
+import { useFormErrors } from "../hooks/useFormErrors";
+
 const layout = {
   width: "100%",
   labelCol: { span: 8 },
@@ -21,21 +31,37 @@ const validateMessages = {
 };
 
 const SingUp = () => {
-  const [state, setState] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImage] = useState();
-  const onFinish = (values) => {
-    console.log(values);
-  };
-  const handleChange = (info) => {
+  const [singUp, { data }] = useSignUpMutation();
+  const [image, setImage] = useState<{ url: string; file?: Blob }>();
+  const { form } = useFormErrors({
+    response: data?.signUp,
+    success: () => router.push("/login"),
+  });
+
+  const router = useRouter();
+
+  const onFinish = async (fields: SignUpMutationVariables) =>
+    singUp({
+      variables: {
+        ...fields,
+        age: fields.age || 0,
+        picture: image?.file,
+      },
+    });
+
+  const handleChange = (info: UploadChangeParam<UploadFile<any>>) => {
     if (info.file.status === "uploading") {
-      setState(true);
+      setLoading(true);
       return;
     }
     if (info.file.status === "done") {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, (imageUrl) => {
-        setState(false), setImage(imageUrl);
+      getBase64(info.file.originFileObj, (imageUrl: any) => {
+        setLoading(false);
+        setImage({
+          file: info.file.originFileObj,
+          url: imageUrl,
+        });
       });
     }
   };
@@ -48,7 +74,7 @@ const SingUp = () => {
   );
 
   return (
-    <div className={st.authContainer}>
+    <div style={{ width: "100%", margin: "auto" }}>
       <div
         style={{
           width: "10%",
@@ -60,18 +86,19 @@ const SingUp = () => {
           listType="picture-card"
           className="avatar-uploader"
           showUploadList={false}
-          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+          multiple={false}
           beforeUpload={beforeUpload}
           onChange={handleChange}
         >
-          {imageUrl ? (
-            <img src={imageUrl} alt="avatar" style={{ width: "100%" }} />
+          {image?.url ? (
+            <img src={image?.url} alt="avatar" style={{ width: "100%" }} />
           ) : (
             uploadButton
           )}
         </Upload>
       </div>
       <Form
+        form={form}
         {...layout}
         name="nest-messages"
         onFinish={onFinish}
@@ -88,6 +115,13 @@ const SingUp = () => {
           <Input placeholder="example@test.com" />
         </Form.Item>
         <Form.Item
+          name="password"
+          label="Password"
+          rules={[{ required: true }]}
+        >
+          <Input placeholder="ej 1234." />
+        </Form.Item>
+        <Form.Item
           name="username"
           label="Username"
           rules={[{ required: true }]}
@@ -102,7 +136,7 @@ const SingUp = () => {
           <InputNumber />
         </Form.Item>
 
-        <Form.Item name="description" label="Description">
+        <Form.Item name="about" label="Description">
           <Input.TextArea placeholder="About me ..." />
         </Form.Item>
 
@@ -116,4 +150,4 @@ const SingUp = () => {
   );
 };
 
-export default SingUp;
+export default withApollo({ ssr: true })(SingUp);

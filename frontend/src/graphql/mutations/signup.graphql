@@ -1,0 +1,28 @@
+mutation signUp(
+  $picture: Upload
+  $name: String!
+  $username: String!
+  $age: Int!
+  $email: String!
+  $password: String!
+  $about: String
+) {
+  signUp(
+    profile_picture: $picture
+    fields: {
+      username: $username
+      name: $name
+      age: $age
+      email: $email
+      password: $password
+      about: $about
+    }
+  ) {
+    message
+    errors {
+      field
+      error
+    }
+    success
+  }
+}

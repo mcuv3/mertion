@@ -4,9 +4,11 @@ import { withApollo } from "../lib/withApollo";
 import React, { useContext } from "react";
 import { observer } from "mobx-react";
 import PostsStore from "../store/index";
+import { useMeQuery } from "../generated/graphql";
 
 const Home = () => {
   const store = useContext(PostsStore);
+  const { data } = useMeQuery();
 
   return (
     <div>
@@ -27,6 +29,4 @@ const Home = () => {
   );
 };
 
-export default observer(Home);
-
-//export default withApollo({ ssr: false })(Index);
+export default withApollo({ ssr: true })(observer(Home));

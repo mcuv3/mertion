@@ -1,9 +1,10 @@
 import v from "validator";
-import { ErrorField } from "../error/ErrorType";
-enum ValidationFields {
+import { ErrorField } from "../error/ErrorResponse";
+export enum ValidationFields {
   required = "required",
   positive = "positive",
   Length = "length",
+  Image = "image",
 }
 
 interface Conf {
@@ -38,6 +39,13 @@ export function PositiveNumber(target: any, propName: string) {
   };
 }
 
+export function ImageFile(target: any, propName: string) {
+  registeredValidators[target.constructor.name] = {
+    ...registeredValidators[target.constructor.name],
+    [propName]: [{ validationField: ValidationFields.Image }],
+  };
+}
+
 export function Length(conf: LengthType) {
   return function (target: any, propName: string) {
     registeredValidators[target.constructor.name] = {
@@ -57,49 +65,3 @@ export function Length(conf: LengthType) {
         }
     }
 */
-
-export function validate(
-  className: keyof ValidatorConfig,
-  obj: any
-): ErrorField[] {
-  const errors: ErrorField[] = [];
-  const objValidatorConfig = registeredValidators[className];
-  if (!objValidatorConfig) {
-    return errors;
-  }
-  let isValid;
-  for (const prop in objValidatorConfig) {
-    for (const validator of objValidatorConfig[prop]) {
-      switch (validator.validationField) {
-        case ValidationFields.required:
-          isValid = !v.isEmpty(obj[prop]);
-          if (!isValid) errors.push({ error: "Field required", field: prop });
-          break;
-        case ValidationFields.positive:
-          isValid = v.isInt(obj[prop], { min: 1 });
-          if (!isValid) errors.push({ error: "Must be positive", field: prop });
-          break;
-        case ValidationFields.Length:
-          if (typeof obj[prop] === "number") {
-            isValid = v.isFloat(obj[prop].toString(), {
-              min: validator.config?.min || -Number.MAX_VALUE,
-              max: validator.config?.max || Number.MAX_VALUE,
-            });
-          } else if (typeof obj[prop] === "string") {
-            isValid = v.isLength(obj[prop], {
-              min: validator.config?.min || -Number.MAX_VALUE,
-              max: validator.config?.max || Number.MAX_VALUE,
-            });
-          }
-          if (!isValid)
-            errors.push({
-              field: prop,
-              error: "The value is to short or greater than the required",
-            });
-
-          break;
-      }
-    }
-  }
-  return errors;
-}

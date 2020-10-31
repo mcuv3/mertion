@@ -20,6 +20,7 @@ import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { Auth } from "./resolvers/Auth";
 import { User } from "./entities/index";
+import { graphqlUploadExpress } from "graphql-upload";
 
 const main = async () => {
   // SET UP CONNECTION TO THE DATABASE THROUGH TYPEORM
@@ -42,10 +43,16 @@ const main = async () => {
   const redis = new Redis(REDIS_URL);
 
   //app.set("trust proxy", 1);
-  app.use(cors());
+  app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
+  app.use(
+    cors({
+      credentials: true,
+      origin: "http://localhost:3000",
+    })
+  );
   app.use(
     session({
-      name: COOKIE_NAME,
+      name: COOKIE_NAME || "qid",
       store: new RedisStore({
         client: redis,
         disableTouch: true,
@@ -54,8 +61,8 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
         httpOnly: true,
         sameSite: "lax", // csrf
-        // secure: __prod__, // cookie only works in https
-        //domain: __prod__ ? ".mydomain.com" : undefined,
+        secure: __prod__, // cookie only works in https
+        domain: __prod__ ? ".mydomain.com" : undefined,
       },
       saveUninitialized: false,
       secret: SESSION_SECRET,
@@ -64,6 +71,7 @@ const main = async () => {
   );
 
   const apolloServer = new ApolloServer({
+    uploads: false,
     schema: await buildSchema({
       resolvers: [Auth],
       validate: false,
@@ -80,12 +88,16 @@ const main = async () => {
     cors: false,
   });
 
-  app.listen(5555, (e) => {
-    console.log(`SERVER STARING AT PORT: ${5555}`);
+  app.listen(4001, (e) => {
+    console.log(`Available at http://localhost:${4001}/graphql`);
   });
 };
 
 main().catch((e) => {
   console.log(e);
   console.error("CANNOT INITIALIZE THE SERVER");
+});
+
+process.on("unhandledRejection", () => {
+  process.exit();
 });

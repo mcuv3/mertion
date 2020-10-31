@@ -13,7 +13,8 @@ declare namespace Express {
     isAuth: boolean;
     user: {
       email: string;
-      role: string;
+      username: string;
+      picture: string;
     };
   }
 }

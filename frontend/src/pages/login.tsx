@@ -1,6 +1,9 @@
 import { useRouter } from "next/router";
 import { Form, Input, Button, Checkbox } from "antd";
-import st from "../styles/auth.module.css";
+
+import { withApollo } from "../lib/withApollo";
+import { useFormErrors } from "../hooks/useFormErrors";
+import { LoginMutationVariables, useLoginMutation } from "../generated/graphql";
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
@@ -10,31 +13,28 @@ const tailLayout = {
 };
 
 const Login = () => {
-  const onFinish = (values) => {
-    console.log("Success:", values);
-  };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
+  const [login, { data, loading }] = useLoginMutation();
+  const router = useRouter();
+  const { form } = useFormErrors({
+    response: data?.logIn,
+    success: () => router.push("/"),
+  });
+  const onFinish = async (values: LoginMutationVariables) =>
+    login({ variables: values });
 
   return (
-    <div className={st.authContainer}>
-      {/* <div style={{ width: "30%", height: "100%", backgroundColor: "white" }}>
-        Side
-      </div> */}
-
+    <div style={{ width: "100%", margin: "auto" }}>
       <Form
         {...layout}
+        form={form}
         name="basic"
         initialValues={{ remember: true }}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
       >
         <Form.Item
-          label="Username"
-          name="username"
-          rules={[{ required: true, message: "Please input your username!" }]}
+          label="Email"
+          name="email"
+          rules={[{ required: true, message: "Please input your email!" }]}
         >
           <Input />
         </Form.Item>
@@ -52,7 +52,7 @@ const Login = () => {
         </Form.Item>
 
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             Submit
           </Button>
         </Form.Item>
@@ -61,11 +61,4 @@ const Login = () => {
   );
 };
 
-export default Login;
-
-// onClick={() => {
-//   const path = router.query?.next;
-//   console.log(path);
-//   if (typeof path === "string") router.push(path);
-//   else router.push("/");
-// }}
+export default withApollo({ ssr: true })(Login);

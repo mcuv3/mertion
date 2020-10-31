@@ -1,14 +1,16 @@
 import { createWithApollo } from "./createWithApollo";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { NextPageContext } from "next";
+import { createUploadLink } from "apollo-upload-client";
 
-console.log(process.env.NEXT_PUBLIC_API_URL);
+const link = createUploadLink({ uri: "http://localhost:4001/graphql" });
+
 const createClient = (ctx: NextPageContext) =>
   new ApolloClient({
+    link,
     uri: process.env.NEXT_PUBLIC_API_URL as string,
     credentials: "include",
     headers: {
-      //  here either your cookie or your jwt
       cookie:
         (typeof window === "undefined"
           ? ctx?.req?.headers.cookie
