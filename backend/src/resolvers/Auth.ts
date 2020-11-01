@@ -128,7 +128,6 @@ export class Auth {
 
   @Mutation(() => Boolean)
   logout(@Ctx() { req }: MyContext) {
-    req.session.userId = null;
     req.session.destroy(() => {});
     return true;
   }

@@ -21,6 +21,12 @@ import { buildSchema } from "type-graphql";
 import { Auth } from "./resolvers/Auth";
 import { User, Mert } from "./entities/index";
 import { graphqlUploadExpress } from "graphql-upload";
+import { customAuthChecker } from "./middlewares/is-Auth";
+import { MertsResolver } from "./resolvers/Merts";
+import {
+  ApolloServerPluginUsageReporting,
+  AuthenticationError,
+} from "apollo-server-core";
 
 const main = async () => {
   // SET UP CONNECTION TO THE DATABASE THROUGH TYPEORM
@@ -72,8 +78,10 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     uploads: false,
+
     schema: await buildSchema({
-      resolvers: [Auth],
+      authChecker: customAuthChecker,
+      resolvers: [Auth, MertsResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({
@@ -81,6 +89,28 @@ const main = async () => {
       res,
       redis,
     }),
+    formatError: (err) => {
+      console.log(err);
+      // Don't give the specific errors to the client.
+      if (err.message.startsWith("Access denied")) {
+        return { success: false, message: "Not Authorized" };
+      }
+      // Otherwise return the original error.  The error can also
+      // be manipulated in other ways, so long as it's returned.
+      return err;
+    },
+    // plugins: [
+    //   ApolloServerPluginUsageReporting({
+    //     rewriteError(err) {
+    //       // Return `null` to avoid reporting `AuthenticationError`s
+    //       if (err instanceof AuthenticationError) {
+    //         return null;
+    //       }
+    //       // All other errors will be reported.
+    //       return err;
+    //     },
+    //   }),
+    // ],
   });
 
   apolloServer.applyMiddleware({
