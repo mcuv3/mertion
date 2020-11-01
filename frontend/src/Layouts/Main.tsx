@@ -3,15 +3,30 @@ import {
   UserOutlined,
   RadarChartOutlined,
   UsergroupAddOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import React, { PropsWithChildren } from "react";
 
 import Link from "next/link";
+import { useLogOutMutation, useMeQuery } from "../generated/graphql";
+import { withApollo } from "../lib/withApollo";
+import { useApolloClient } from "@apollo/client";
 const { Content, Footer, Header } = Layout;
 const { Title } = Typography;
-export const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
+
+const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const router = useRouter();
+  const client = useApolloClient();
+  const { data, loading } = useMeQuery();
+  const [logout] = useLogOutMutation();
+
+  const logOut = async () => {
+    await logout();
+    client.cache.evict({});
+    router.push("/");
+  };
+
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <Header
@@ -25,28 +40,38 @@ export const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         <Link passHref href="/">
           <RadarChartOutlined style={{ fontSize: "2.5rem", color: "white" }} />
         </Link>
-        <div className="">
+        {data?.me && !loading ? (
           <Button
             type="primary"
-            icon={<UserOutlined />}
+            icon={<LogoutOutlined />}
             size="large"
             style={{ marginRight: "1rem" }}
-            onClick={() => {
-              router.push("/login");
-            }}
-          >
-            SingIn
-          </Button>
-          <Button
-            icon={<UsergroupAddOutlined />}
-            size="large"
-            onClick={() => {
-              router.push("/signup");
-            }}
-          >
-            SignUp
-          </Button>
-        </div>
+            onClick={logOut}
+          />
+        ) : (
+          <div className="">
+            <Button
+              type="primary"
+              icon={<UserOutlined />}
+              size="large"
+              style={{ marginRight: "1rem" }}
+              onClick={() => {
+                router.push("/login");
+              }}
+            >
+              SingIn
+            </Button>
+            <Button
+              icon={<UsergroupAddOutlined />}
+              size="large"
+              onClick={() => {
+                router.push("/signup");
+              }}
+            >
+              SignUp
+            </Button>
+          </div>
+        )}
       </Header>
       <Content
         style={{
@@ -66,3 +91,5 @@ export const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     </Layout>
   );
 };
+
+export default withApollo({ ssr: false })(Main);

@@ -3,7 +3,15 @@ import { Form, Input, Button, Checkbox } from "antd";
 
 import { withApollo } from "../lib/withApollo";
 import { useFormErrors } from "../hooks/useFormErrors";
-import { LoginMutationVariables, useLoginMutation } from "../generated/graphql";
+import { globalApolloClient } from "../lib/createWithApollo";
+import {
+  LoginMutationVariables,
+  MeDocument,
+  MeQuery,
+  useLoginMutation,
+  useMeLazyQuery,
+} from "../generated/graphql";
+
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
@@ -13,11 +21,30 @@ const tailLayout = {
 };
 
 const Login = () => {
-  const [login, { data, loading }] = useLoginMutation();
+  const [login, { data, loading }] = useLoginMutation({
+    update: (cache, { data }) => {
+      if (data?.logIn.success)
+        cache.writeQuery<MeQuery>({
+          query: MeDocument,
+          data: {
+            __typename: "Query",
+            me: {
+              email: data.logIn.email,
+              picture: data.logIn.picture,
+              username: data.logIn.username,
+            },
+          },
+        });
+    },
+  });
   const router = useRouter();
   const { form } = useFormErrors({
     response: data?.logIn,
-    success: () => router.push("/"),
+    success: () => {
+      const next = router.query.next;
+      if (typeof next === "string") router.push(next);
+      else router.push("/");
+    },
   });
   const onFinish = async (values: LoginMutationVariables) =>
     login({ variables: values });

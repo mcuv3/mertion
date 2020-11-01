@@ -1,4 +1,4 @@
-import { Main } from "../Layouts/Main";
+import Main from "../Layouts/Main";
 import "../styles/antd.less";
 import NextNprogress from "nextjs-progressbar";
 

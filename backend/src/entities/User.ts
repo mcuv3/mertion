@@ -1,5 +1,14 @@
 import { Field, Int, ObjectType, InputType } from "type-graphql";
-import { BaseEntity, Column, Entity, Generated, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Generated,
+  OneToMany,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Mert } from "./Mert";
 
 @ObjectType()
 @Entity()
@@ -35,4 +44,7 @@ export class User extends BaseEntity {
   @Field()
   @Column("varchar")
   picture!: string;
+
+  @OneToMany(() => Mert, (m) => m.user)
+  merts!: Mert[];
 }

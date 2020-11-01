@@ -5,7 +5,7 @@ import { ApolloProvider } from "@apollo/client";
 
 // On the client, we store the Apollo Client in the following variable.
 // This prevents the client from reinitializing between page transitions.
-let globalApolloClient = null;
+export let globalApolloClient = null;
 
 /**
  * Installs the Apollo Client on NextPageContext

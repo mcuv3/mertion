@@ -8,8 +8,6 @@ COPY .env.production .env
 
 COPY . .
 
-
-
 RUN npm i
 
 EXPOSE 4000

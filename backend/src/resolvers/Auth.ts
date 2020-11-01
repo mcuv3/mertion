@@ -26,9 +26,14 @@ import { extension } from "../utils/fileExtension";
 @Resolver()
 export class Auth {
   @Query(() => MeResponse, { nullable: true })
-  me(@Ctx() { req }: MyContext): MeResponse | null {
+  async me(@Ctx() { req }: MyContext) {
     if (!req.session.user) return null;
-    return req.session.user;
+    const user = await User.findOne(req.session.userId);
+    return {
+      email: user?.email,
+      username: user?.username,
+      picture: user?.picture,
+    };
   }
 
   @Mutation(() => SignUpResponse)
@@ -84,11 +89,11 @@ export class Auth {
     return { success: true };
   }
 
-  @Mutation(() => ErrorResponse || Boolean)
+  @Mutation(() => MeResponse)
   async logIn(
     @Arg("fields") fields: SingInInput,
     @Ctx() { req }: MyContext
-  ): Promise<ErrorResponse | boolean> {
+  ): Promise<MeResponse> {
     const errors = new SingInInput(fields).validate();
     if (errors.length > 0) {
       return {
@@ -111,8 +116,20 @@ export class Auth {
         success: false,
       };
 
-    req.session.user = user;
+    req.session.userId = user.id;
 
-    return { success: true };
+    return {
+      email: user.email,
+      username: user.username,
+      picture: user.picture,
+      success: true,
+    };
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req }: MyContext) {
+    req.session.userId = null;
+    req.session.destroy(() => {});
+    return true;
   }
 }

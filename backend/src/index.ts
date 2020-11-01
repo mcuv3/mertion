@@ -19,14 +19,14 @@ import path from "path";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { Auth } from "./resolvers/Auth";
-import { User } from "./entities/index";
+import { User, Mert } from "./entities/index";
 import { graphqlUploadExpress } from "graphql-upload";
 
 const main = async () => {
   // SET UP CONNECTION TO THE DATABASE THROUGH TYPEORM
   await createConnection({
     type: "postgres",
-    entities: [User],
+    entities: [User, Mert],
     url: DATABASE_URL,
     logging: true,
     synchronize: true,
@@ -42,7 +42,7 @@ const main = async () => {
   const RedisStore = connectRedis(session);
   const redis = new Redis(REDIS_URL);
 
-  //app.set("trust proxy", 1);
+  app.set("trust proxy", 1);
   app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
   app.use(
     cors({
@@ -52,7 +52,7 @@ const main = async () => {
   );
   app.use(
     session({
-      name: COOKIE_NAME || "qid",
+      name: COOKIE_NAME,
       store: new RedisStore({
         client: redis,
         disableTouch: true,
@@ -88,8 +88,8 @@ const main = async () => {
     cors: false,
   });
 
-  app.listen(4001, (e) => {
-    console.log(`Available at http://localhost:${4001}/graphql`);
+  app.listen(PORT, (e) => {
+    console.log(`Available at http://localhost:${PORT}/graphql`);
   });
 };
 

@@ -47,17 +47,17 @@ export class SingUpInput extends Validator {
 }
 
 @ObjectType()
-export class SignUpResponse extends ErrorResponse {}
+export class MeResponse extends ErrorResponse {
+  @Field(() => String, { nullable: true })
+  email?: string;
+  @Field(() => String, { nullable: true })
+  username?: string;
+  @Field(() => String, { nullable: true })
+  picture?: string;
+}
 
 @ObjectType()
-export class MeResponse {
-  @Field()
-  email!: string;
-  @Field()
-  username!: string;
-  @Field()
-  picture!: string;
-}
+export class SignUpResponse extends ErrorResponse {}
 
 @InputType()
 export class SingInInput extends Validator {
