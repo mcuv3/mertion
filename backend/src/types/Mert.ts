@@ -1,6 +1,7 @@
 import { GraphQLUpload } from "graphql-upload";
-import { Field, InputType } from "type-graphql";
+import { Field, InputType, ObjectType } from "type-graphql";
 import { Mert } from "../entities/Mert";
+import { ErrorResponse } from "../error/ErrorResponse";
 import { Upload } from "../types";
 import { Validator } from "../validation/Validator";
 import { ImageFile, Required } from "../validation/validator_config";
@@ -18,11 +19,17 @@ export class MertInput extends Validator {
   @Field(() => GraphQLUpload, { nullable: true })
   picture?: Upload;
 
-  @Field()
+  @Field({ nullable: true })
   fatherId?: string;
 
   constructor(fields: MertInput) {
     super();
     this.fields = fields;
   }
+}
+
+@ObjectType()
+export class MertCreationResponse extends ErrorResponse {
+  @Field(() => Mert, { nullable: true })
+  mert?: Mert;
 }

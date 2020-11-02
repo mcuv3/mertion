@@ -25,7 +25,7 @@ export class Mert extends BaseEntity {
   @CreateDateColumn()
   createdAt!: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column("text", { nullable: true })
   picture?: string;
 

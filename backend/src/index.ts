@@ -27,6 +27,8 @@ import {
   ApolloServerPluginUsageReporting,
   AuthenticationError,
 } from "apollo-server-core";
+import { mertLoader } from "./DataLoader/MertLoader";
+import { MyContext } from "./types";
 
 const main = async () => {
   // SET UP CONNECTION TO THE DATABASE THROUGH TYPEORM
@@ -84,10 +86,11 @@ const main = async () => {
       resolvers: [Auth, MertsResolver],
       validate: false,
     }),
-    context: ({ req, res }) => ({
+    context: ({ req, res }: MyContext) => ({
       req,
       res,
       redis,
+      mertLoader: mertLoader(),
     }),
     formatError: (err) => {
       console.log(err);

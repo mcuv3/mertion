@@ -41,7 +41,7 @@ export class User extends BaseEntity {
   @Column("text")
   about!: string;
 
-  @Field()
+  @Field({ nullable: true })
   @Column("varchar")
   picture!: string;
 

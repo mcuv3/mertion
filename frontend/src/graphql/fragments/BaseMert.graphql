@@ -1,0 +1,13 @@
+fragment BaseMert on Mert {
+  id
+  mert
+  likes
+  picture
+  dislikes
+  picture
+  createdAt
+  user {
+    username
+    picture
+  }
+}

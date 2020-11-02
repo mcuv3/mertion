@@ -8,8 +8,6 @@ interface Props {
   loading: boolean;
 }
 
-const featureIconStyle = {};
-
 export const Editor = ({ loading, onSubmit }: Props) => {
   const ref = React.useRef() as React.RefObject<TextArea>;
   return (
@@ -27,15 +25,16 @@ export const Editor = ({ loading, onSubmit }: Props) => {
         <div className="">
           <Tooltip key="comment-basic-like-1" title="icons">
             <SmileOutlined
-              style={{ fontSize: "1rem", marginRight: "0.5rem" }}
+              style={{ fontSize: "1.5rem", marginRight: "0.5rem" }}
             />
           </Tooltip>
 
           <Tooltip key="comment-basic-like-2" title="picture">
-            <PictureOutlined style={{ fontSize: "1rem" }} />
+            <PictureOutlined style={{ fontSize: "1.5rem" }} />
           </Tooltip>
         </div>
         <Button
+          size="middle"
           htmlType="submit"
           loading={loading}
           onClick={() => onSubmit(ref?.current?.state.value || "")}

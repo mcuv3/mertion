@@ -1,5 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
-import { Success } from "../mutation_types/general";
+import { Success } from "../types/general";
 import { extension } from "../utils/fileExtension";
 
 export interface ErrorField {
@@ -17,8 +17,8 @@ class ErrorFieldClass implements ErrorField {
 
 @ObjectType()
 export class ErrorResponse extends Success {
-  @Field(()=>String,{nullable:true})
+  @Field(() => String, { nullable: true })
   message?: string;
-  @Field(() => [ErrorFieldClass],{nullable:true})
+  @Field(() => [ErrorFieldClass], { nullable: true })
   errors?: ErrorField[];
 }

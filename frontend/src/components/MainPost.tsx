@@ -1,21 +1,26 @@
 import React, { createElement, useState } from "react";
 import { Comment, Tooltip, Avatar } from "antd";
-import moment from "moment";
+import dayjs from "../util/dayjs";
 import {
   DislikeOutlined,
   LikeOutlined,
   DislikeFilled,
   LikeFilled,
 } from "@ant-design/icons";
-import { useMeQuery } from "../generated/graphql";
+import { Mert, useMeQuery } from "../generated/graphql";
 import { withApollo } from "../lib/withApollo";
 import { useRouter } from "next/router";
+import me from "../pages/me";
 
-const MainPost = () => {
-  const [likes, setLikes] = useState(0);
-  const [dislikes, setDislikes] = useState(0);
+interface Props {
+  mert: Mert;
+}
+
+const MainPost: React.FC<Props> = ({ mert }) => {
+  const [likes, setLikes] = useState(mert.likes);
+  const [dislikes, setDislikes] = useState(mert.dislikes);
   const [action, setAction] = useState<string | null>(null);
-  const { data } = useMeQuery();
+
   const router = useRouter();
 
   const like = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
@@ -49,33 +54,27 @@ const MainPost = () => {
     </Tooltip>,
     <span key="comment-basic-reply-to">Reply to</span>,
   ];
-
+  console.log(new Date(+mert.createdAt));
   return (
     <div
       onClick={() => {
-        router.push(`/[user]/[mweet]`, "/mcuve/1");
+        router.push(`/[user]/[mweet]`, `/${mert.user.username}/1`);
       }}
     >
       <Comment
         style={{ border: "1px solid #ccc", padding: "0 1rem" }}
         actions={actions}
-        author={<a>{data?.me?.username}</a>}
+        author={<a>{mert.user.username}</a>}
         avatar={
           <Avatar
-            src={data?.me?.picture || ""}
-            alt={data?.me?.username || ""}
+            src={mert.user.picture || ""}
+            alt={mert.user.username || ""}
           />
         }
-        content={
-          <p>
-            We supply a series of design principles, practical patterns and high
-            quality design resources (Sketch and Axure), to help people create
-            their product prototypes beautifully and efficiently.
-          </p>
-        }
+        content={<p>{mert.mert}</p>}
         datetime={
-          <Tooltip title={moment().format("YYYY-MM-DD HH:mm:ss")}>
-            <span>{moment().fromNow()}</span>
+          <Tooltip title={dayjs().from(dayjs(new Date(+mert.createdAt)))}>
+            <span>{dayjs().from(dayjs(new Date(+mert.createdAt)))}</span>
           </Tooltip>
         }
       />

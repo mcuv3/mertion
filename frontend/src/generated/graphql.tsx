@@ -1,7 +1,9 @@
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import { gql } from "@apollo/client";
+import * as Apollo from "@apollo/client";
 export type Maybe<T> = T | null;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -14,143 +16,344 @@ export type Scalars = {
 };
 
 export type Query = {
-  __typename?: 'Query';
+  __typename?: "Query";
   me?: Maybe<MeResponse>;
+  mert?: Maybe<Mert>;
+  merts?: Maybe<Array<Mert>>;
+};
+
+export type QueryMertArgs = {
+  mertId: Scalars["String"];
+};
+
+export type QueryMertsArgs = {
+  cursor?: Maybe<Scalars["String"]>;
+  mertId?: Maybe<Scalars["String"]>;
 };
 
 export type MeResponse = {
-  __typename?: 'MeResponse';
-  success: Scalars['Boolean'];
-  message?: Maybe<Scalars['String']>;
+  __typename?: "MeResponse";
+  success: Scalars["Boolean"];
+  message?: Maybe<Scalars["String"]>;
   errors?: Maybe<Array<ErrorFieldClass>>;
-  email?: Maybe<Scalars['String']>;
-  username?: Maybe<Scalars['String']>;
-  picture?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars["String"]>;
+  username?: Maybe<Scalars["String"]>;
+  picture?: Maybe<Scalars["String"]>;
 };
 
 export type ErrorFieldClass = {
-  __typename?: 'ErrorFieldClass';
-  field: Scalars['String'];
-  error: Scalars['String'];
+  __typename?: "ErrorFieldClass";
+  field: Scalars["String"];
+  error: Scalars["String"];
+};
+
+export type Mert = {
+  __typename?: "Mert";
+  id: Scalars["String"];
+  mert: Scalars["String"];
+  createdAt: Scalars["String"];
+  picture?: Maybe<Scalars["String"]>;
+  likes: Scalars["Float"];
+  dislikes: Scalars["Float"];
+  fatherId: Scalars["String"];
+  userId: Scalars["String"];
+  user: User;
+  father?: Maybe<Mert>;
+};
+
+export type User = {
+  __typename?: "User";
+  id: Scalars["String"];
+  name: Scalars["String"];
+  username: Scalars["String"];
+  age: Scalars["Int"];
+  email: Scalars["String"];
+  password: Scalars["String"];
+  about: Scalars["String"];
+  picture?: Maybe<Scalars["String"]>;
 };
 
 export type Mutation = {
-  __typename?: 'Mutation';
+  __typename?: "Mutation";
   signUp: SignUpResponse;
   logIn: MeResponse;
-  logout: Scalars['Boolean'];
+  logout: Scalars["Boolean"];
+  createMert: MertCreationResponse;
 };
-
 
 export type MutationSignUpArgs = {
-  profile_picture?: Maybe<Scalars['Upload']>;
+  profile_picture?: Maybe<Scalars["Upload"]>;
   fields: SingUpInput;
 };
-
 
 export type MutationLogInArgs = {
   fields: SingInInput;
 };
 
+export type MutationCreateMertArgs = {
+  fields: MertInput;
+};
+
 export type SignUpResponse = {
-  __typename?: 'SignUpResponse';
-  success: Scalars['Boolean'];
-  message?: Maybe<Scalars['String']>;
+  __typename?: "SignUpResponse";
+  success: Scalars["Boolean"];
+  message?: Maybe<Scalars["String"]>;
   errors?: Maybe<Array<ErrorFieldClass>>;
 };
 
-
 export type SingUpInput = {
-  name: Scalars['String'];
-  username: Scalars['String'];
-  age: Scalars['Int'];
-  email: Scalars['String'];
-  password: Scalars['String'];
-  about?: Maybe<Scalars['String']>;
+  name: Scalars["String"];
+  username: Scalars["String"];
+  age: Scalars["Int"];
+  email: Scalars["String"];
+  password: Scalars["String"];
+  about?: Maybe<Scalars["String"]>;
 };
 
 export type SingInInput = {
-  email: Scalars['String'];
-  password: Scalars['String'];
+  email: Scalars["String"];
+  password: Scalars["String"];
+};
+
+export type MertCreationResponse = {
+  __typename?: "MertCreationResponse";
+  success: Scalars["Boolean"];
+  message?: Maybe<Scalars["String"]>;
+  errors?: Maybe<Array<ErrorFieldClass>>;
+  mert?: Maybe<Mert>;
+};
+
+export type MertInput = {
+  mert: Scalars["String"];
+  picture?: Maybe<Scalars["Upload"]>;
+  fatherId?: Maybe<Scalars["String"]>;
+};
+
+export type BaseMertFragment = { __typename?: "Mert" } & Pick<
+  Mert,
+  "id" | "mert" | "likes" | "picture" | "dislikes" | "createdAt"
+> & { user: { __typename?: "User" } & Pick<User, "username" | "picture"> };
+
+export type CreateMertMutationVariables = Exact<{
+  mert: Scalars["String"];
+  picture?: Maybe<Scalars["Upload"]>;
+  fatherId?: Maybe<Scalars["String"]>;
+}>;
+
+export type CreateMertMutation = { __typename?: "Mutation" } & {
+  createMert: { __typename?: "MertCreationResponse" } & Pick<
+    MertCreationResponse,
+    "success" | "message"
+  > & {
+      mert?: Maybe<{ __typename?: "Mert" } & BaseMertFragment>;
+      errors?: Maybe<
+        Array<
+          { __typename?: "ErrorFieldClass" } & Pick<
+            ErrorFieldClass,
+            "field" | "error"
+          >
+        >
+      >;
+    };
 };
 
 export type LoginMutationVariables = Exact<{
-  email: Scalars['String'];
-  password: Scalars['String'];
+  email: Scalars["String"];
+  password: Scalars["String"];
 }>;
 
+export type LoginMutation = { __typename?: "Mutation" } & {
+  logIn: { __typename?: "MeResponse" } & Pick<
+    MeResponse,
+    "success" | "message" | "email" | "username" | "picture"
+  > & {
+      errors?: Maybe<
+        Array<
+          { __typename?: "ErrorFieldClass" } & Pick<
+            ErrorFieldClass,
+            "field" | "error"
+          >
+        >
+      >;
+    };
+};
 
-export type LoginMutation = (
-  { __typename?: 'Mutation' }
-  & { logIn: (
-    { __typename?: 'MeResponse' }
-    & Pick<MeResponse, 'success' | 'message' | 'email' | 'username' | 'picture'>
-    & { errors?: Maybe<Array<(
-      { __typename?: 'ErrorFieldClass' }
-      & Pick<ErrorFieldClass, 'field' | 'error'>
-    )>> }
-  ) }
-);
+export type LogOutMutationVariables = Exact<{ [key: string]: never }>;
 
-export type LogOutMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type LogOutMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'logout'>
-);
+export type LogOutMutation = { __typename?: "Mutation" } & Pick<
+  Mutation,
+  "logout"
+>;
 
 export type SignUpMutationVariables = Exact<{
-  picture?: Maybe<Scalars['Upload']>;
-  name: Scalars['String'];
-  username: Scalars['String'];
-  age: Scalars['Int'];
-  email: Scalars['String'];
-  password: Scalars['String'];
-  about?: Maybe<Scalars['String']>;
+  picture?: Maybe<Scalars["Upload"]>;
+  name: Scalars["String"];
+  username: Scalars["String"];
+  age: Scalars["Int"];
+  email: Scalars["String"];
+  password: Scalars["String"];
+  about?: Maybe<Scalars["String"]>;
 }>;
 
+export type SignUpMutation = { __typename?: "Mutation" } & {
+  signUp: { __typename?: "SignUpResponse" } & Pick<
+    SignUpResponse,
+    "message" | "success"
+  > & {
+      errors?: Maybe<
+        Array<
+          { __typename?: "ErrorFieldClass" } & Pick<
+            ErrorFieldClass,
+            "field" | "error"
+          >
+        >
+      >;
+    };
+};
 
-export type SignUpMutation = (
-  { __typename?: 'Mutation' }
-  & { signUp: (
-    { __typename?: 'SignUpResponse' }
-    & Pick<SignUpResponse, 'message' | 'success'>
-    & { errors?: Maybe<Array<(
-      { __typename?: 'ErrorFieldClass' }
-      & Pick<ErrorFieldClass, 'field' | 'error'>
-    )>> }
-  ) }
-);
+export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+export type MeQuery = { __typename?: "Query" } & {
+  me?: Maybe<
+    { __typename?: "MeResponse" } & Pick<
+      MeResponse,
+      "email" | "username" | "picture"
+    >
+  >;
+};
 
+export type MertQueryVariables = Exact<{
+  mertId: Scalars["String"];
+}>;
 
-export type MeQuery = (
-  { __typename?: 'Query' }
-  & { me?: Maybe<(
-    { __typename?: 'MeResponse' }
-    & Pick<MeResponse, 'email' | 'username' | 'picture'>
-  )> }
-);
+export type MertQuery = { __typename?: "Query" } & {
+  mert?: Maybe<
+    { __typename?: "Mert" } & Pick<
+      Mert,
+      "id" | "mert" | "createdAt" | "picture" | "likes" | "dislikes"
+    > & {
+        father?: Maybe<
+          { __typename?: "Mert" } & Pick<
+            Mert,
+            "id" | "createdAt" | "likes" | "dislikes"
+          > & {
+              user: { __typename?: "User" } & Pick<
+                User,
+                "username" | "picture"
+              >;
+            }
+        >;
+        user: { __typename?: "User" } & Pick<User, "username" | "picture">;
+      }
+  >;
+};
 
+export type MertsQueryVariables = Exact<{
+  mertId?: Maybe<Scalars["String"]>;
+  cursor?: Maybe<Scalars["String"]>;
+}>;
 
-export const LoginDocument = gql`
-    mutation Login($email: String!, $password: String!) {
-  logIn(fields: {email: $email, password: $password}) {
-    success
-    message
-    errors {
-      field
-      error
-    }
-    email
-    username
+export type MertsQuery = { __typename?: "Query" } & {
+  merts?: Maybe<Array<{ __typename?: "Mert" } & BaseMertFragment>>;
+};
+
+export const BaseMertFragmentDoc = gql`
+  fragment BaseMert on Mert {
+    id
+    mert
+    likes
     picture
+    dislikes
+    picture
+    createdAt
+    user {
+      username
+      picture
+    }
   }
+`;
+export const CreateMertDocument = gql`
+  mutation CreateMert($mert: String!, $picture: Upload, $fatherId: String) {
+    createMert(
+      fields: { mert: $mert, picture: $picture, fatherId: $fatherId }
+    ) {
+      mert {
+        ...BaseMert
+      }
+      success
+      errors {
+        field
+        error
+      }
+      message
+    }
+  }
+  ${BaseMertFragmentDoc}
+`;
+export type CreateMertMutationFn = Apollo.MutationFunction<
+  CreateMertMutation,
+  CreateMertMutationVariables
+>;
+
+/**
+ * __useCreateMertMutation__
+ *
+ * To run a mutation, you first call `useCreateMertMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateMertMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createMertMutation, { data, loading, error }] = useCreateMertMutation({
+ *   variables: {
+ *      mert: // value for 'mert'
+ *      picture: // value for 'picture'
+ *      fatherId: // value for 'fatherId'
+ *   },
+ * });
+ */
+export function useCreateMertMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    CreateMertMutation,
+    CreateMertMutationVariables
+  >
+) {
+  return Apollo.useMutation<CreateMertMutation, CreateMertMutationVariables>(
+    CreateMertDocument,
+    baseOptions
+  );
 }
-    `;
-export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
+export type CreateMertMutationHookResult = ReturnType<
+  typeof useCreateMertMutation
+>;
+export type CreateMertMutationResult = Apollo.MutationResult<
+  CreateMertMutation
+>;
+export type CreateMertMutationOptions = Apollo.BaseMutationOptions<
+  CreateMertMutation,
+  CreateMertMutationVariables
+>;
+export const LoginDocument = gql`
+  mutation Login($email: String!, $password: String!) {
+    logIn(fields: { email: $email, password: $password }) {
+      success
+      errors {
+        field
+        error
+      }
+      message
+      email
+      username
+      picture
+    }
+  }
+`;
+export type LoginMutationFn = Apollo.MutationFunction<
+  LoginMutation,
+  LoginMutationVariables
+>;
 
 /**
  * __useLoginMutation__
@@ -170,18 +373,32 @@ export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutati
  *   },
  * });
  */
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, baseOptions);
-      }
+export function useLoginMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LoginMutation,
+    LoginMutationVariables
+  >
+) {
+  return Apollo.useMutation<LoginMutation, LoginMutationVariables>(
+    LoginDocument,
+    baseOptions
+  );
+}
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export type LoginMutationOptions = Apollo.BaseMutationOptions<
+  LoginMutation,
+  LoginMutationVariables
+>;
 export const LogOutDocument = gql`
-    mutation LogOut {
-  logout
-}
-    `;
-export type LogOutMutationFn = Apollo.MutationFunction<LogOutMutation, LogOutMutationVariables>;
+  mutation LogOut {
+    logout
+  }
+`;
+export type LogOutMutationFn = Apollo.MutationFunction<
+  LogOutMutation,
+  LogOutMutationVariables
+>;
 
 /**
  * __useLogOutMutation__
@@ -199,28 +416,57 @@ export type LogOutMutationFn = Apollo.MutationFunction<LogOutMutation, LogOutMut
  *   },
  * });
  */
-export function useLogOutMutation(baseOptions?: Apollo.MutationHookOptions<LogOutMutation, LogOutMutationVariables>) {
-        return Apollo.useMutation<LogOutMutation, LogOutMutationVariables>(LogOutDocument, baseOptions);
-      }
+export function useLogOutMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    LogOutMutation,
+    LogOutMutationVariables
+  >
+) {
+  return Apollo.useMutation<LogOutMutation, LogOutMutationVariables>(
+    LogOutDocument,
+    baseOptions
+  );
+}
 export type LogOutMutationHookResult = ReturnType<typeof useLogOutMutation>;
 export type LogOutMutationResult = Apollo.MutationResult<LogOutMutation>;
-export type LogOutMutationOptions = Apollo.BaseMutationOptions<LogOutMutation, LogOutMutationVariables>;
+export type LogOutMutationOptions = Apollo.BaseMutationOptions<
+  LogOutMutation,
+  LogOutMutationVariables
+>;
 export const SignUpDocument = gql`
-    mutation signUp($picture: Upload, $name: String!, $username: String!, $age: Int!, $email: String!, $password: String!, $about: String) {
-  signUp(
-    profile_picture: $picture
-    fields: {username: $username, name: $name, age: $age, email: $email, password: $password, about: $about}
+  mutation signUp(
+    $picture: Upload
+    $name: String!
+    $username: String!
+    $age: Int!
+    $email: String!
+    $password: String!
+    $about: String
   ) {
-    message
-    errors {
-      field
-      error
+    signUp(
+      profile_picture: $picture
+      fields: {
+        username: $username
+        name: $name
+        age: $age
+        email: $email
+        password: $password
+        about: $about
+      }
+    ) {
+      message
+      errors {
+        field
+        error
+      }
+      success
     }
-    success
   }
-}
-    `;
-export type SignUpMutationFn = Apollo.MutationFunction<SignUpMutation, SignUpMutationVariables>;
+`;
+export type SignUpMutationFn = Apollo.MutationFunction<
+  SignUpMutation,
+  SignUpMutationVariables
+>;
 
 /**
  * __useSignUpMutation__
@@ -245,21 +491,32 @@ export type SignUpMutationFn = Apollo.MutationFunction<SignUpMutation, SignUpMut
  *   },
  * });
  */
-export function useSignUpMutation(baseOptions?: Apollo.MutationHookOptions<SignUpMutation, SignUpMutationVariables>) {
-        return Apollo.useMutation<SignUpMutation, SignUpMutationVariables>(SignUpDocument, baseOptions);
-      }
+export function useSignUpMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    SignUpMutation,
+    SignUpMutationVariables
+  >
+) {
+  return Apollo.useMutation<SignUpMutation, SignUpMutationVariables>(
+    SignUpDocument,
+    baseOptions
+  );
+}
 export type SignUpMutationHookResult = ReturnType<typeof useSignUpMutation>;
 export type SignUpMutationResult = Apollo.MutationResult<SignUpMutation>;
-export type SignUpMutationOptions = Apollo.BaseMutationOptions<SignUpMutation, SignUpMutationVariables>;
+export type SignUpMutationOptions = Apollo.BaseMutationOptions<
+  SignUpMutation,
+  SignUpMutationVariables
+>;
 export const MeDocument = gql`
-    query Me {
-  me {
-    email
-    username
-    picture
+  query Me {
+    me {
+      email
+      username
+      picture
+    }
   }
-}
-    `;
+`;
 
 /**
  * __useMeQuery__
@@ -276,12 +533,129 @@ export const MeDocument = gql`
  *   },
  * });
  */
-export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
-        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
-      }
-export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
-          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
-        }
+export function useMeQuery(
+  baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>
+) {
+  return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, baseOptions);
+}
+export function useMeLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>
+) {
+  return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(
+    MeDocument,
+    baseOptions
+  );
+}
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const MertDocument = gql`
+  query Mert($mertId: String!) {
+    mert(mertId: $mertId) {
+      id
+      mert
+      createdAt
+      picture
+      likes
+      dislikes
+      father {
+        id
+        createdAt
+        likes
+        dislikes
+        user {
+          username
+          picture
+        }
+      }
+      user {
+        username
+        picture
+      }
+    }
+  }
+`;
+
+/**
+ * __useMertQuery__
+ *
+ * To run a query within a React component, call `useMertQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMertQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMertQuery({
+ *   variables: {
+ *      mertId: // value for 'mertId'
+ *   },
+ * });
+ */
+export function useMertQuery(
+  baseOptions?: Apollo.QueryHookOptions<MertQuery, MertQueryVariables>
+) {
+  return Apollo.useQuery<MertQuery, MertQueryVariables>(
+    MertDocument,
+    baseOptions
+  );
+}
+export function useMertLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<MertQuery, MertQueryVariables>
+) {
+  return Apollo.useLazyQuery<MertQuery, MertQueryVariables>(
+    MertDocument,
+    baseOptions
+  );
+}
+export type MertQueryHookResult = ReturnType<typeof useMertQuery>;
+export type MertLazyQueryHookResult = ReturnType<typeof useMertLazyQuery>;
+export type MertQueryResult = Apollo.QueryResult<MertQuery, MertQueryVariables>;
+export const MertsDocument = gql`
+  query Merts($mertId: String, $cursor: String) {
+    merts(mertId: $mertId, cursor: $cursor) {
+      ...BaseMert
+    }
+  }
+  ${BaseMertFragmentDoc}
+`;
+
+/**
+ * __useMertsQuery__
+ *
+ * To run a query within a React component, call `useMertsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMertsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMertsQuery({
+ *   variables: {
+ *      mertId: // value for 'mertId'
+ *      cursor: // value for 'cursor'
+ *   },
+ * });
+ */
+export function useMertsQuery(
+  baseOptions?: Apollo.QueryHookOptions<MertsQuery, MertsQueryVariables>
+) {
+  return Apollo.useQuery<MertsQuery, MertsQueryVariables>(
+    MertsDocument,
+    baseOptions
+  );
+}
+export function useMertsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<MertsQuery, MertsQueryVariables>
+) {
+  return Apollo.useLazyQuery<MertsQuery, MertsQueryVariables>(
+    MertsDocument,
+    baseOptions
+  );
+}
+export type MertsQueryHookResult = ReturnType<typeof useMertsQuery>;
+export type MertsLazyQueryHookResult = ReturnType<typeof useMertsLazyQuery>;
+export type MertsQueryResult = Apollo.QueryResult<
+  MertsQuery,
+  MertsQueryVariables
+>;

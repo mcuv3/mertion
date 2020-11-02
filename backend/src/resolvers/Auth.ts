@@ -14,7 +14,7 @@ import {
   SignUpResponse,
   SingInInput,
   SingUpInput,
-} from "../mutation_types/Auth";
+} from "../types/Auth";
 import { MyContext, Upload } from "../types";
 import { createWriteStream } from "fs";
 import path from "path";
@@ -27,7 +27,7 @@ import { extension } from "../utils/fileExtension";
 export class Auth {
   @Query(() => MeResponse, { nullable: true })
   async me(@Ctx() { req }: MyContext) {
-    if (!req.session.user) return null;
+    if (!req.session.userId) return null;
     const user = await User.findOne(req.session.userId);
     return {
       email: user?.email,

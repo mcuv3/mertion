@@ -6,6 +6,7 @@ import {
   NormalizedCacheObject,
 } from "@apollo/client";
 import { NextPageContext } from "next";
+import {} from "../generated/graphql";
 import { createUploadLink } from "apollo-upload-client";
 
 const link = createUploadLink({
@@ -15,9 +16,8 @@ const link = createUploadLink({
 
 export let client: ApolloClient<NormalizedCacheObject>;
 
-const createClient = (ctx: NextPageContext) => {
-  console.log(ctx?.req);
-  client = new ApolloClient({
+const createClient = (ctx: NextPageContext) =>
+  new ApolloClient({
     link,
     uri: process.env.NEXT_PUBLIC_API_URL as string,
     credentials: "include",
@@ -31,13 +31,16 @@ const createClient = (ctx: NextPageContext) => {
       typePolicies: {
         Query: {
           fields: {
+            merts: {
+              merge(current = [], newer) {
+                return [...newer, ...current];
+              },
+            },
             // your mutations
           },
         },
       },
     }),
   });
-  return client;
-};
 
 export const withApollo = createWithApollo(createClient);

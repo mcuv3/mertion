@@ -1,0 +1,13 @@
+mutation CreateMert($mert: String!, $picture: Upload, $fatherId: String) {
+  createMert(fields: { mert: $mert, picture: $picture, fatherId: $fatherId }) {
+    mert {
+      ...BaseMert
+    }
+    success
+    errors {
+      field
+      error
+    }
+    message
+  }
+}
