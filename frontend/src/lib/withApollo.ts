@@ -14,8 +14,6 @@ const link = createUploadLink({
   credentials: "include",
 });
 
-export let client: ApolloClient<NormalizedCacheObject>;
-
 const createClient = (ctx: NextPageContext) =>
   new ApolloClient({
     link,
@@ -31,11 +29,11 @@ const createClient = (ctx: NextPageContext) =>
       typePolicies: {
         Query: {
           fields: {
-            merts: {
-              merge(current = [], newer) {
-                return [...newer, ...current];
-              },
-            },
+            // merts: {
+            //   merge(current = [], newer) {
+            //     return [...newer, ...current];
+            //   },
+            // },
             // your mutations
           },
         },

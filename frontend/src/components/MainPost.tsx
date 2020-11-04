@@ -1,4 +1,5 @@
 import React, { createElement, useState } from "react";
+import { useStore } from "../store/index";
 import { Comment, Tooltip, Avatar } from "antd";
 import dayjs from "../util/dayjs";
 import {
@@ -11,6 +12,7 @@ import { Mert, useMeQuery } from "../generated/graphql";
 import { withApollo } from "../lib/withApollo";
 import { useRouter } from "next/router";
 import me from "../pages/me";
+import Reply from "./Reply";
 
 interface Props {
   mert: Mert;
@@ -20,6 +22,8 @@ const MainPost: React.FC<Props> = ({ mert }) => {
   const [likes, setLikes] = useState(mert.likes);
   const [dislikes, setDislikes] = useState(mert.dislikes);
   const [action, setAction] = useState<string | null>(null);
+  const [reply, setReply] = useState(false);
+  const { mertStore } = useStore();
 
   const router = useRouter();
 
@@ -52,33 +56,43 @@ const MainPost: React.FC<Props> = ({ mert }) => {
         <span className="comment-action">{dislikes}</span>
       </span>
     </Tooltip>,
-    <span key="comment-basic-reply-to">Reply to</span>,
+    <span key="comment-basic-reply-to" onClick={() => setReply(!reply)}>
+      Reply to
+    </span>,
   ];
-  console.log(new Date(+mert.createdAt));
+
   return (
-    <div
-      onClick={() => {
-        router.push(`/[user]/[mweet]`, `/${mert.user.username}/1`);
-      }}
-    >
-      <Comment
-        style={{ border: "1px solid #ccc", padding: "0 1rem" }}
-        actions={actions}
-        author={<a>{mert.user.username}</a>}
-        avatar={
-          <Avatar
-            src={mert.user.picture || ""}
-            alt={mert.user.username || ""}
-          />
-        }
-        content={<p>{mert.mert}</p>}
-        datetime={
-          <Tooltip title={dayjs().from(dayjs(new Date(+mert.createdAt)))}>
-            <span>{dayjs().from(dayjs(new Date(+mert.createdAt)))}</span>
-          </Tooltip>
-        }
-      />
-    </div>
+    <>
+      {reply && <Reply fatherMert={mert} close={() => setReply(!reply)} />}
+      <div
+        onClick={() => {
+          mertStore.setMert(mert);
+          router.push(
+            `/[user]/[mert]`,
+            `/${mert.user.username}/${mert.id}`,
+            {}
+          );
+        }}
+      >
+        <Comment
+          style={{ border: "1px solid #ccc", padding: "0 1rem" }}
+          actions={actions}
+          author={<a>{mert.user.username}</a>}
+          avatar={
+            <Avatar
+              src={mert.user.picture || ""}
+              alt={mert.user.username || ""}
+            />
+          }
+          content={<p>{mert.mert}</p>}
+          datetime={
+            <Tooltip title={dayjs().from(dayjs(new Date(+mert.createdAt)))}>
+              <span>{dayjs().from(dayjs(new Date(+mert.createdAt)))}</span>
+            </Tooltip>
+          }
+        />
+      </div>
+    </>
   );
 };
 

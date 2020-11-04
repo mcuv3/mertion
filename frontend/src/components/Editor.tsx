@@ -1,19 +1,39 @@
 import { Button, Tooltip } from "antd";
 import TextArea from "antd/lib/input/TextArea";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { PictureOutlined, SmileOutlined } from "@ant-design/icons";
+import { changeConfirmLocale } from "antd/lib/modal/locale";
 
 interface Props {
-  onSubmit: (val: string) => void;
+  onSubmit?: (val: string) => void;
   loading: boolean;
+  isReply?: boolean;
+  change?: (val: string) => void;
+  valueReply?: string;
 }
 
-export const Editor = ({ loading, onSubmit }: Props) => {
-  const ref = React.useRef() as React.RefObject<TextArea>;
+export const Editor = ({
+  loading,
+  onSubmit,
+  isReply = false,
+  change,
+  valueReply,
+}: Props) => {
+  const [value, setValue] = useState("");
+  const submit = () => onSubmit && onSubmit(value);
+
   return (
     <div>
       <>
-        <TextArea rows={3} ref={ref} placeholder="Share your gains" />
+        <TextArea
+          value={isReply ? valueReply : value}
+          onChange={(e) => {
+            if (isReply && change) change(e.target.value);
+            else setValue(e.target.value);
+          }}
+          rows={3}
+          placeholder="Share your gains"
+        />
       </>
       <div
         style={{
@@ -33,15 +53,17 @@ export const Editor = ({ loading, onSubmit }: Props) => {
             <PictureOutlined style={{ fontSize: "1.5rem" }} />
           </Tooltip>
         </div>
-        <Button
-          size="middle"
-          htmlType="submit"
-          loading={loading}
-          onClick={() => onSubmit(ref?.current?.state.value || "")}
-          type="primary"
-        >
-          mcweet
-        </Button>
+        {!isReply && (
+          <Button
+            size="middle"
+            htmlType="submit"
+            loading={loading}
+            onClick={submit}
+            type="primary"
+          >
+            mcweet
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import React from "react";
 import { Editor } from "./Editor";
 import { useRouter } from "next/router";
 import { changeConfirmLocale } from "antd/lib/modal/locale";
+import { updateCreateMert } from "../common/updateMert";
 
 interface Props {
   me: MeResponse;
@@ -23,46 +24,20 @@ export const AddPost: React.FC<Props> = ({
   fatherId,
 }) => {
   const router = useRouter();
-
   const [createMert, { loading }] = useCreateMertMutation({
-    update: (cache, { data }) => {
-      if (data?.createMert.success) {
-        const merts = cache.readQuery<MertsQuery>({
-          query: MertsDocument,
-          variables: { cursor: null, mertId: null },
-        });
-        const mert = data.createMert.mert;
-        console.log(mert);
-
-        cache.writeQuery<MertsQuery>({
-          query: MertsDocument,
-          variables: { cursor: null, mertId: null },
-          data: {
-            merts: [{ ...mert } as Mert, ...(merts?.merts || [])],
-          },
-        });
-      }
-    },
+    update: updateCreateMert(fatherId),
   });
-  const create = (mert: string) => {
+
+  const create = (mert: string) =>
     createMert({
       variables: {
         mert,
         fatherId,
       },
     });
-  };
 
   return (
     <Comment
-      //   actions={[
-      //     <Tooltip key="comment-basic-like" title="icons">
-      //       <SmileOutlined />
-      //     </Tooltip>,
-      //     <Tooltip key="comment-basic-like" title="picture">
-      //       <PictureOutlined />
-      //     </Tooltip>,
-      //   ]}
       avatar={
         <div
           onClick={(e) => {
@@ -70,7 +45,6 @@ export const AddPost: React.FC<Props> = ({
             router.push(`/${username}`);
           }}
         >
-          {" "}
           <Avatar size="large" src={picture || ""} alt={username || ""} />
         </div>
       }
