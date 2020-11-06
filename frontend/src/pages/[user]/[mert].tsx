@@ -1,12 +1,19 @@
 import { withApollo } from "../../lib/withApollo";
-import { Mert, useMertsQuery } from "../../generated/graphql";
+import { Mert, useMertQuery, useMertsQuery } from "../../generated/graphql";
 import { useRouter } from "next/router";
-import { useStore } from "../../store";
 import MainPost from "../../components/MainPost";
+import React from "react";
+import { NotFound } from "../../components/404";
+
 const Post = () => {
   const router = useRouter();
 
-  const { mertStore } = useStore();
+  const { data: father } = useMertQuery({
+    variables: {
+      mertId:
+        typeof router.query?.mert === "string" ? router.query!.mert : null,
+    },
+  });
   const { data } = useMertsQuery({
     variables: {
       cursor: null,
@@ -14,14 +21,13 @@ const Post = () => {
         typeof router.query?.mert === "string" ? router.query?.mert : null,
     },
   });
-  // if(data?.merts)
-  console.log(mertStore.mert);
-  if (!mertStore?.mert) return <div>Not Found</div>;
+
+  if (!father?.mert) return <NotFound />;
 
   return (
     <div style={{ width: "100%" }}>
       <div style={{ marginBottom: "1rem" }}>
-        <MainPost mert={mertStore.mert as Mert} />
+        <MainPost mert={father.mert as Mert} father />
       </div>
 
       {data?.merts?.map((m) => {

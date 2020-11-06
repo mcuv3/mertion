@@ -29,13 +29,13 @@ export class Mert extends BaseEntity {
   @Column("text", { nullable: true })
   picture?: string;
 
-  @Field()
-  @Column("numeric", { default: 0 })
-  likes?: number;
+  @Field(() => [String])
+  @Column("simple-array")
+  likes?: Set<string>;
 
-  @Field()
-  @Column("numeric", { default: 0 })
-  dislikes?: number;
+  @Field(() => [String])
+  @Column("simple-array")
+  dislikes?: Set<string>;
 
   @Field()
   @Column("uuid", { nullable: true })

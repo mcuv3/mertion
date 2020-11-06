@@ -1,0 +1,11 @@
+query UserReactions($reaction: Reactions!, $mertId: String!) {
+  usersReactions(reaction: $reaction, mertId: $mertId) {
+    success
+    message
+    users {
+      id
+      username
+      picture
+    }
+  }
+}

@@ -20,15 +20,21 @@ export type Query = {
   me?: Maybe<MeResponse>;
   mert?: Maybe<Mert>;
   merts?: Maybe<Array<Mert>>;
+  usersReactions: UserReactionsResponse;
 };
 
 export type QueryMertArgs = {
-  mertId: Scalars["String"];
+  mertId?: Maybe<Scalars["String"]>;
 };
 
 export type QueryMertsArgs = {
   cursor?: Maybe<Scalars["String"]>;
   mertId?: Maybe<Scalars["String"]>;
+};
+
+export type QueryUsersReactionsArgs = {
+  reaction: Reactions;
+  mertId: Scalars["String"];
 };
 
 export type MeResponse = {
@@ -53,8 +59,8 @@ export type Mert = {
   mert: Scalars["String"];
   createdAt: Scalars["String"];
   picture?: Maybe<Scalars["String"]>;
-  likes: Scalars["Float"];
-  dislikes: Scalars["Float"];
+  likes: Array<Scalars["String"]>;
+  dislikes: Array<Scalars["String"]>;
   fatherId: Scalars["String"];
   userId: Scalars["String"];
   user: User;
@@ -73,12 +79,27 @@ export type User = {
   picture?: Maybe<Scalars["String"]>;
 };
 
+export type UserReactionsResponse = {
+  __typename?: "UserReactionsResponse";
+  success: Scalars["Boolean"];
+  message?: Maybe<Scalars["String"]>;
+  errors?: Maybe<Array<ErrorFieldClass>>;
+  users: Array<User>;
+};
+
+/** like dislike */
+export enum Reactions {
+  Like = "Like",
+  DisLike = "DisLike",
+}
+
 export type Mutation = {
   __typename?: "Mutation";
   signUp: SignUpResponse;
   logIn: MeResponse;
   logout: Scalars["Boolean"];
   createMert: MertCreationResponse;
+  reactMert?: Maybe<ReactionsMertResponse>;
 };
 
 export type MutationSignUpArgs = {
@@ -92,6 +113,11 @@ export type MutationLogInArgs = {
 
 export type MutationCreateMertArgs = {
   fields: MertInput;
+};
+
+export type MutationReactMertArgs = {
+  mertId: Scalars["String"];
+  reaction: Reactions;
 };
 
 export type SignUpResponse = {
@@ -129,9 +155,15 @@ export type MertInput = {
   fatherId?: Maybe<Scalars["String"]>;
 };
 
+export type ReactionsMertResponse = {
+  __typename?: "ReactionsMertResponse";
+  likes: Array<Scalars["String"]>;
+  dislikes: Array<Scalars["String"]>;
+};
+
 export type BaseMertFragment = { __typename?: "Mert" } & Pick<
   Mert,
-  "id" | "mert" | "likes" | "picture" | "dislikes" | "createdAt"
+  "id" | "mert" | "likes" | "dislikes" | "picture" | "createdAt"
 > & { user: { __typename?: "User" } & Pick<User, "username" | "picture"> };
 
 export type CreateMertMutationVariables = Exact<{
@@ -185,6 +217,20 @@ export type LogOutMutation = { __typename?: "Mutation" } & Pick<
   "logout"
 >;
 
+export type ReactMertMutationVariables = Exact<{
+  reaction: Reactions;
+  mertId: Scalars["String"];
+}>;
+
+export type ReactMertMutation = { __typename?: "Mutation" } & {
+  reactMert?: Maybe<
+    { __typename?: "ReactionsMertResponse" } & Pick<
+      ReactionsMertResponse,
+      "likes" | "dislikes"
+    >
+  >;
+};
+
 export type SignUpMutationVariables = Exact<{
   picture?: Maybe<Scalars["Upload"]>;
   name: Scalars["String"];
@@ -223,28 +269,21 @@ export type MeQuery = { __typename?: "Query" } & {
 };
 
 export type MertQueryVariables = Exact<{
-  mertId: Scalars["String"];
+  mertId?: Maybe<Scalars["String"]>;
 }>;
 
 export type MertQuery = { __typename?: "Query" } & {
   mert?: Maybe<
-    { __typename?: "Mert" } & Pick<
-      Mert,
-      "id" | "mert" | "createdAt" | "picture" | "likes" | "dislikes"
-    > & {
-        father?: Maybe<
-          { __typename?: "Mert" } & Pick<
-            Mert,
-            "id" | "createdAt" | "likes" | "dislikes"
-          > & {
-              user: { __typename?: "User" } & Pick<
-                User,
-                "username" | "picture"
-              >;
-            }
-        >;
-        user: { __typename?: "User" } & Pick<User, "username" | "picture">;
-      }
+    { __typename?: "Mert" } & {
+      father?: Maybe<
+        { __typename?: "Mert" } & Pick<
+          Mert,
+          "id" | "createdAt" | "likes" | "dislikes"
+        > & {
+            user: { __typename?: "User" } & Pick<User, "username" | "picture">;
+          }
+      >;
+    } & BaseMertFragment
   >;
 };
 
@@ -257,12 +296,27 @@ export type MertsQuery = { __typename?: "Query" } & {
   merts?: Maybe<Array<{ __typename?: "Mert" } & BaseMertFragment>>;
 };
 
+export type UserReactionsQueryVariables = Exact<{
+  reaction: Reactions;
+  mertId: Scalars["String"];
+}>;
+
+export type UserReactionsQuery = { __typename?: "Query" } & {
+  usersReactions: { __typename?: "UserReactionsResponse" } & Pick<
+    UserReactionsResponse,
+    "success" | "message"
+  > & {
+      users: Array<
+        { __typename?: "User" } & Pick<User, "id" | "username" | "picture">
+      >;
+    };
+};
+
 export const BaseMertFragmentDoc = gql`
   fragment BaseMert on Mert {
     id
     mert
     likes
-    picture
     dislikes
     picture
     createdAt
@@ -433,6 +487,56 @@ export type LogOutMutationOptions = Apollo.BaseMutationOptions<
   LogOutMutation,
   LogOutMutationVariables
 >;
+export const ReactMertDocument = gql`
+  mutation ReactMert($reaction: Reactions!, $mertId: String!) {
+    reactMert(reaction: $reaction, mertId: $mertId) {
+      likes
+      dislikes
+    }
+  }
+`;
+export type ReactMertMutationFn = Apollo.MutationFunction<
+  ReactMertMutation,
+  ReactMertMutationVariables
+>;
+
+/**
+ * __useReactMertMutation__
+ *
+ * To run a mutation, you first call `useReactMertMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReactMertMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [reactMertMutation, { data, loading, error }] = useReactMertMutation({
+ *   variables: {
+ *      reaction: // value for 'reaction'
+ *      mertId: // value for 'mertId'
+ *   },
+ * });
+ */
+export function useReactMertMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ReactMertMutation,
+    ReactMertMutationVariables
+  >
+) {
+  return Apollo.useMutation<ReactMertMutation, ReactMertMutationVariables>(
+    ReactMertDocument,
+    baseOptions
+  );
+}
+export type ReactMertMutationHookResult = ReturnType<
+  typeof useReactMertMutation
+>;
+export type ReactMertMutationResult = Apollo.MutationResult<ReactMertMutation>;
+export type ReactMertMutationOptions = Apollo.BaseMutationOptions<
+  ReactMertMutation,
+  ReactMertMutationVariables
+>;
 export const SignUpDocument = gql`
   mutation signUp(
     $picture: Upload
@@ -550,14 +654,9 @@ export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const MertDocument = gql`
-  query Mert($mertId: String!) {
+  query Mert($mertId: String) {
     mert(mertId: $mertId) {
-      id
-      mert
-      createdAt
-      picture
-      likes
-      dislikes
+      ...BaseMert
       father {
         id
         createdAt
@@ -568,12 +667,9 @@ export const MertDocument = gql`
           picture
         }
       }
-      user {
-        username
-        picture
-      }
     }
   }
+  ${BaseMertFragmentDoc}
 `;
 
 /**
@@ -658,4 +754,67 @@ export type MertsLazyQueryHookResult = ReturnType<typeof useMertsLazyQuery>;
 export type MertsQueryResult = Apollo.QueryResult<
   MertsQuery,
   MertsQueryVariables
+>;
+export const UserReactionsDocument = gql`
+  query UserReactions($reaction: Reactions!, $mertId: String!) {
+    usersReactions(reaction: $reaction, mertId: $mertId) {
+      success
+      message
+      users {
+        id
+        username
+        picture
+      }
+    }
+  }
+`;
+
+/**
+ * __useUserReactionsQuery__
+ *
+ * To run a query within a React component, call `useUserReactionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserReactionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserReactionsQuery({
+ *   variables: {
+ *      reaction: // value for 'reaction'
+ *      mertId: // value for 'mertId'
+ *   },
+ * });
+ */
+export function useUserReactionsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    UserReactionsQuery,
+    UserReactionsQueryVariables
+  >
+) {
+  return Apollo.useQuery<UserReactionsQuery, UserReactionsQueryVariables>(
+    UserReactionsDocument,
+    baseOptions
+  );
+}
+export function useUserReactionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UserReactionsQuery,
+    UserReactionsQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<UserReactionsQuery, UserReactionsQueryVariables>(
+    UserReactionsDocument,
+    baseOptions
+  );
+}
+export type UserReactionsQueryHookResult = ReturnType<
+  typeof useUserReactionsQuery
+>;
+export type UserReactionsLazyQueryHookResult = ReturnType<
+  typeof useUserReactionsLazyQuery
+>;
+export type UserReactionsQueryResult = Apollo.QueryResult<
+  UserReactionsQuery,
+  UserReactionsQueryVariables
 >;

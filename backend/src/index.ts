@@ -32,7 +32,7 @@ import { MyContext } from "./types";
 
 const main = async () => {
   // SET UP CONNECTION TO THE DATABASE THROUGH TYPEORM
-  await createConnection({
+  const db = await createConnection({
     type: "postgres",
     entities: [User, Mert],
     url: DATABASE_URL,
@@ -87,6 +87,7 @@ const main = async () => {
       validate: false,
     }),
     context: ({ req, res }: MyContext) => ({
+      db,
       req,
       res,
       redis,
@@ -102,18 +103,6 @@ const main = async () => {
       // be manipulated in other ways, so long as it's returned.
       return err;
     },
-    // plugins: [
-    //   ApolloServerPluginUsageReporting({
-    //     rewriteError(err) {
-    //       // Return `null` to avoid reporting `AuthenticationError`s
-    //       if (err instanceof AuthenticationError) {
-    //         return null;
-    //       }
-    //       // All other errors will be reported.
-    //       return err;
-    //     },
-    //   }),
-    // ],
   });
 
   apolloServer.applyMiddleware({

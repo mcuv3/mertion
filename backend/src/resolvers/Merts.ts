@@ -9,9 +9,16 @@ import {
   Root,
 } from "type-graphql";
 import { createWriteStream } from "fs";
-import { Mert } from "../entities";
+import { Mert, User } from "../entities";
 import { ErrorResponse } from "../error/ErrorResponse";
-import { MertCreationResponse, MertInput } from "../types/Mert";
+import {
+  MertCreationResponse,
+  MertInput,
+  Reaction,
+  Reactions,
+  ReactionsMertResponse,
+  UserReactionsResponse,
+} from "../types/Mert";
 import { MyContext } from "../types";
 import { IMAGE_MERT } from "../constants";
 import { extension } from "../utils/fileExtension";
@@ -19,7 +26,6 @@ import { getManager, LessThan } from "typeorm";
 
 @Resolver(Mert)
 export class MertsResolver {
-  @Authorized()
   @FieldResolver(() => Mert, { nullable: true })
   async father(@Root() mert: Mert, @Ctx() { mertLoader }: MyContext) {
     return mert.fatherId ? mertLoader.load(mert.fatherId) : null;
@@ -46,6 +52,8 @@ export class MertsResolver {
           fatherId: fields.fatherId,
           userId: req.session.userId,
           createdAt: new Date().toISOString(),
+          likes: [],
+          dislikes: [],
         }).save();
 
         if (fields.picture) {
@@ -87,7 +95,8 @@ export class MertsResolver {
   }
 
   @Query(() => Mert, { nullable: true })
-  mert(@Arg("mertId") mertId: string) {
+  mert(@Arg("mertId", { nullable: true }) mertId: string) {
+    if (!mertId) return null;
     return Mert.findOne(mertId, { relations: ["user"] });
   }
 
@@ -109,5 +118,67 @@ export class MertsResolver {
         createdAt: "DESC",
       },
     });
+  }
+
+  @Authorized()
+  @Mutation(() => ReactionsMertResponse, { nullable: true })
+  async reactMert(
+    @Arg("reaction", () => Reactions) reaction: Reactions,
+    @Arg("mertId") mertId: string,
+    @Ctx() { db, req }: MyContext
+  ): Promise<ReactionsMertResponse | null> {
+    const mert = await Mert.findOne(mertId);
+
+    if (!mert) return null;
+
+    let likesSet = new Set(mert.likes);
+    let dislikesSet = new Set(mert.dislikes);
+
+    if (reaction === Reactions.Like) {
+      dislikesSet.delete(req.session.userId);
+      likesSet.add(req.session.userId);
+    } else {
+      dislikesSet.add(req.session.userId);
+      likesSet.delete(req.session.userId);
+    }
+    const likes = Array.from(likesSet);
+    const dislikes = Array.from(dislikesSet);
+
+    await Mert.update(mert.id, {
+      likes,
+      dislikes,
+    });
+
+    return {
+      likes,
+      dislikes,
+    };
+  }
+
+  @Query(() => UserReactionsResponse)
+  async usersReactions(
+    @Arg("mertId") mertId: string,
+    @Arg("reaction", () => Reactions) reaction: Reactions
+  ): Promise<UserReactionsResponse> {
+    const mert = await Mert.findOne(mertId);
+    if (!mert) return { success: false, message: "Cannot find the mert" };
+
+    let users;
+
+    if (reaction === Reactions.Like) {
+      users = mert.likes;
+    }
+    if (reaction === Reactions.DisLike) {
+      users = mert.dislikes;
+    }
+
+    if (!users) return { success: false };
+
+    const usersReaction = await User.findByIds(Array.from(users));
+
+    return {
+      success: true,
+      users: usersReaction,
+    };
   }
 }

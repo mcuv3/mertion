@@ -2,7 +2,6 @@ fragment BaseMert on Mert {
   id
   mert
   likes
-  picture
   dislikes
   picture
   createdAt

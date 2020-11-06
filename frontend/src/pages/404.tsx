@@ -1,5 +1,5 @@
-const _404 = () => {
-  return <h1>Page not found</h1>;
-};
+import { NotFound } from "../components/404";
+
+const _404 = () => <NotFound />;
 
 export default _404;

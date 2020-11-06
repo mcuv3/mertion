@@ -6,8 +6,11 @@ services:
     command: npm run dev
     ports:
       - "4000:4000"
-    # volumes:
-    #   - .:/app
+    volumes:
+      - /app/node_modules
+      - .:/app
+    environment:
+      - ./.env
     depends_on:
       - postgres
       - redis
@@ -21,6 +24,15 @@ services:
     image: redis
     volumes:
       - redis_db:/data
+  web:
+    build:
+      context: ./../frontend/
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./../frontend:/web
+    depends_on:
+      - app
 
 volumes:
   redis_db:

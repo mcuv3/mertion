@@ -18,13 +18,12 @@ import { useIsAuth } from "../lib/useIsAuth";
 const Home = () => {
   useIsAuth();
   const { data, loading } = useMeQuery();
-  const { data: merts, loading: loadingMert } = useMertsQuery({
+  const { data: merts } = useMertsQuery({
     variables: { cursor: null, mertId: null },
   });
   return (
     <div style={{ width: "100%" }}>
       {data?.me && !loading && <AddPost me={data?.me as MeResponse} />}
-
       {merts?.merts?.map((m) => {
         return <MainPost mert={m as Mert} key={m.id} />;
       })}

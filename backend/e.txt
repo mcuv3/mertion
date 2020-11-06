@@ -1,1 +1,0 @@
-'{"query":"mutation add($pic:Upload!){\n  signUp(profile_picture:$pic)\n}"}'

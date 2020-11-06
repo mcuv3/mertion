@@ -61,7 +61,7 @@ export const Editor = ({
             onClick={submit}
             type="primary"
           >
-            mcweet
+            mert
           </Button>
         )}
       </div>

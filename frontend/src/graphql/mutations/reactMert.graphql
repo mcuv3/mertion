@@ -1,0 +1,6 @@
+mutation ReactMert($reaction: Reactions!, $mertId: String!) {
+  reactMert(reaction: $reaction, mertId: $mertId) {
+    likes
+    dislikes
+  }
+}

@@ -15,6 +15,5 @@ export class MertStore {
 
   setMert = action((mert: Partial<Mert>) => {
     this._mert = mert;
-    //this.price.set(this.price.get() + 1);
   });
 }

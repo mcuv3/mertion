@@ -1,11 +1,6 @@
-query Mert($mertId: String!) {
+query Mert($mertId: String) {
   mert(mertId: $mertId) {
-    id
-    mert
-    createdAt
-    picture
-    likes
-    dislikes
+    ...BaseMert
     father {
       id
       createdAt
@@ -15,10 +10,6 @@ query Mert($mertId: String!) {
         username
         picture
       }
-    }
-    user {
-      username
-      picture
     }
   }
 }
