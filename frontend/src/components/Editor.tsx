@@ -3,6 +3,7 @@ import TextArea from "antd/lib/input/TextArea";
 import React, { useEffect, useState } from "react";
 import { PictureOutlined, SmileOutlined } from "@ant-design/icons";
 import { changeConfirmLocale } from "antd/lib/modal/locale";
+import { ImagePreview } from "./ImagePreview";
 
 interface Props {
   onSubmit?: (val: string) => void;
@@ -10,6 +11,8 @@ interface Props {
   isReply?: boolean;
   change?: (val: string) => void;
   valueReply?: string;
+  setWithImage: () => void;
+  success?: boolean;
 }
 
 export const Editor = ({
@@ -18,9 +21,16 @@ export const Editor = ({
   isReply = false,
   change,
   valueReply,
+  setWithImage,
+  success,
 }: Props) => {
   const [value, setValue] = useState("");
+
   const submit = () => onSubmit && onSubmit(value);
+
+  useEffect(() => {
+    if (success && !loading) setValue("");
+  }, [success, loading]);
 
   return (
     <div>
@@ -42,7 +52,7 @@ export const Editor = ({
           marginTop: "0.3rem",
         }}
       >
-        <div className="">
+        <div>
           <Tooltip key="comment-basic-like-1" title="icons">
             <SmileOutlined
               style={{ fontSize: "1.5rem", marginRight: "0.5rem" }}
@@ -50,8 +60,12 @@ export const Editor = ({
           </Tooltip>
 
           <Tooltip key="comment-basic-like-2" title="picture">
-            <PictureOutlined style={{ fontSize: "1.5rem" }} />
+            <PictureOutlined
+              style={{ fontSize: "1.5rem" }}
+              onClick={() => setWithImage()}
+            />
           </Tooltip>
+          {/* {withImage && <ImagePreview />} */}
         </div>
         {!isReply && (
           <Button

@@ -1,10 +1,12 @@
 FROM node:14
 
+LABEL author="mcuve"
+
 WORKDIR /web
 
 COPY package.json .
 
-RUN npm install
+RUN npm i
 
 COPY . .
 

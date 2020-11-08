@@ -29,10 +29,12 @@ export class Auth {
   async me(@Ctx() { req }: MyContext) {
     if (!req.session.userId) return null;
     const user = await User.findOne(req.session.userId);
+    if (!user) return null;
     return {
-      email: user?.email,
-      username: user?.username,
-      picture: user?.picture,
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      picture: user.picture,
     };
   }
 
@@ -61,7 +63,7 @@ export class Auth {
       };
     }
 
-    const ext = extension(picture.filename);
+    const ext = extension(picture?.filename || "");
     const isGoodFile = ext === ".png" || ext === ".jpg" || ext === ".jpeg";
 
     const hashPassword = await argon2.hash(fields.password);

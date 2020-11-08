@@ -42,10 +42,7 @@ const main = async () => {
   });
 
   const app = express();
-  app.use(
-    "/profile-pictures",
-    express.static(path.join(__dirname, "public", "profile-pictures"))
-  );
+  app.use(express.static(path.join(__dirname, "public")));
 
   const RedisStore = connectRedis(session);
   const redis = new Redis(REDIS_URL);

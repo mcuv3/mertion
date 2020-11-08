@@ -1,19 +1,21 @@
-import { Mert } from "../generated/graphql";
-import { action, computed, observable } from "mobx";
+// import { Mert } from "../generated/graphql";
+// import { action, computed, observable } from "mobx";
 
-export class MertStore {
-  @observable
-  _mert?: Partial<Mert>;
+// export class MertStore {
+//   @observable
+//   _mert?: Partial<Mert>;
 
-  constructor(readonly root: any) {
-    this.root = root;
-  }
-  @computed
-  get mert() {
-    return this._mert;
-  }
+//   constructor(readonly root: any) {
+//     this.root = root;
+//   }
+//   @computed
+//   get mert() {
+//     return this._mert;
+//   }
 
-  setMert = action((mert: Partial<Mert>) => {
-    this._mert = mert;
-  });
-}
+//   setMert = action((mert: Partial<Mert>) => {
+//     this._mert = mert;
+//   });
+// }
+
+export {};

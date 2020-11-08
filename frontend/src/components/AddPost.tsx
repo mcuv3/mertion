@@ -8,11 +8,12 @@ import {
   useCreateMertMutation,
 } from "../generated/graphql";
 const {} = Comment;
-import React from "react";
+import React, { useState } from "react";
 import { Editor } from "./Editor";
 import { useRouter } from "next/router";
 import { changeConfirmLocale } from "antd/lib/modal/locale";
 import { updateCreateMert } from "../common/updateMert";
+import { ImagePreview } from "./ImagePreview";
 
 interface Props {
   me: MeResponse;
@@ -24,17 +25,26 @@ export const AddPost: React.FC<Props> = ({
   fatherId,
 }) => {
   const router = useRouter();
-  const [createMert, { loading }] = useCreateMertMutation({
+  const [createMert, { loading, data }] = useCreateMertMutation({
     update: updateCreateMert(fatherId),
+    notifyOnNetworkStatusChange: true,
   });
+  const [withImage, setWithImage] = useState(false);
+  const [image, setImage] = useState<{ url: string; file?: Blob } | null>();
 
-  const create = (mert: string) =>
-    createMert({
+  const create = async (mert: string) => {
+    const res = await createMert({
       variables: {
         mert,
         fatherId,
+        picture: image?.file,
       },
     });
+    if (res.data?.createMert.success) {
+      setImage(null);
+      setWithImage(false);
+    }
+  };
 
   return (
     <Comment
@@ -48,7 +58,19 @@ export const AddPost: React.FC<Props> = ({
           <Avatar size="large" src={picture || ""} alt={username || ""} />
         </div>
       }
-      content={<Editor loading={loading} onSubmit={create} />}
+      content={
+        <>
+          <Editor
+            loading={loading}
+            onSubmit={create}
+            setWithImage={() => setWithImage((i) => !i)}
+            success={data?.createMert.success}
+          />
+          {withImage && (
+            <ImagePreview image={image} setImage={(e) => setImage(e)} />
+          )}
+        </>
+      }
     />
   );
 };

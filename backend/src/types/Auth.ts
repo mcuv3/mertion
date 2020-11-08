@@ -51,6 +51,8 @@ export class MeResponse extends ErrorResponse {
   @Field(() => String, { nullable: true })
   email?: string;
   @Field(() => String, { nullable: true })
+  id?: string;
+  @Field(() => String, { nullable: true })
   username?: string;
   @Field(() => String, { nullable: true })
   picture?: string;

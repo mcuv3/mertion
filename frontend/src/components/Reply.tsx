@@ -78,6 +78,7 @@ const Reply = ({ fatherMert, close }: Props) => {
             onSubmit={create}
             change={(val) => setMert(val)}
             isReply
+            setWithImage={() => {}}
           />
         }
       />

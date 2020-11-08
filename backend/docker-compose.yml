@@ -8,9 +8,12 @@ services:
       - "4000:4000"
     volumes:
       - /app/node_modules
+      - /app/.env
       - .:/app
     environment:
       - ./.env
+    networks:
+      - host
     depends_on:
       - postgres
       - redis
@@ -19,20 +22,24 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=sellingpoint
+      - POSTGRES_DB=mert
   redis:
     image: redis
+    restart: always
     volumes:
       - redis_db:/data
   web:
-    build:
-      context: ./../frontend/
+    build: /mnt/3822EF8822EF4988/projects-web/mertion/frontend/
     ports:
       - "3000:3000"
     volumes:
-      - ./../frontend:/web
+      - /web/node_modules
+      - /mnt/3822EF8822EF4988/projects-web/mertion/frontend:/web
     depends_on:
       - app
 
 volumes:
   redis_db:
+
+networks:
+  host:

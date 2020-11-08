@@ -1,7 +1,7 @@
 import { withApollo } from "../../lib/withApollo";
 import { Mert, useMertQuery, useMertsQuery } from "../../generated/graphql";
 import { useRouter } from "next/router";
-import MainPost from "../../components/MainPost";
+import MainPost from "../../components/Mert";
 import React from "react";
 import { NotFound } from "../../components/404";
 
@@ -27,7 +27,7 @@ const Post = () => {
   return (
     <div style={{ width: "100%" }}>
       <div style={{ marginBottom: "1rem" }}>
-        <MainPost mert={father.mert as Mert} father />
+        <MainPost mert={father.mert as Mert} isFather />
       </div>
 
       {data?.merts?.map((m) => {

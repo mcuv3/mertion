@@ -43,6 +43,7 @@ export type MeResponse = {
   message?: Maybe<Scalars["String"]>;
   errors?: Maybe<Array<ErrorFieldClass>>;
   email?: Maybe<Scalars["String"]>;
+  id?: Maybe<Scalars["String"]>;
   username?: Maybe<Scalars["String"]>;
   picture?: Maybe<Scalars["String"]>;
 };
@@ -263,7 +264,7 @@ export type MeQuery = { __typename?: "Query" } & {
   me?: Maybe<
     { __typename?: "MeResponse" } & Pick<
       MeResponse,
-      "email" | "username" | "picture"
+      "id" | "email" | "username" | "picture"
     >
   >;
 };
@@ -615,6 +616,7 @@ export type SignUpMutationOptions = Apollo.BaseMutationOptions<
 export const MeDocument = gql`
   query Me {
     me {
+      id
       email
       username
       picture

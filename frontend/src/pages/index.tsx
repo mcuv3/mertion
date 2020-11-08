@@ -1,17 +1,12 @@
-import { NextPageContext } from "next";
 import { withApollo } from "../lib/withApollo";
-
-import React, { useContext, useEffect } from "react";
-import { observer } from "mobx-react";
-
+import React from "react";
 import {
   MeResponse,
   Mert,
-  useMeLazyQuery,
   useMeQuery,
   useMertsQuery,
 } from "../generated/graphql";
-import MainPost from "../components/MainPost";
+import MainPost from "../components/Mert";
 import { AddPost } from "../components/AddPost";
 import { useIsAuth } from "../lib/useIsAuth";
 
@@ -31,4 +26,4 @@ const Home = () => {
   );
 };
 
-export default withApollo({ ssr: true })(observer(Home));
+export default withApollo({ ssr: true })(Home);

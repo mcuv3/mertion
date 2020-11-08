@@ -2,6 +2,7 @@ import { ErrorField } from "../error/ErrorResponse";
 import { registeredValidators, ValidationFields } from "./validator_config";
 import v from "validator";
 import { extension } from "../utils/fileExtension";
+import { Upload } from "../types";
 
 export abstract class Validator {
   protected abstract fields: { [prop: string]: string };
@@ -48,13 +49,14 @@ export abstract class Validator {
 
             break;
           case ValidationFields.Image:
-            if (obj[prop]) {
-              const ext = extension(obj[prop]);
-              if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg")
-                errors.push({
-                  field: prop,
-                  error: "The file must be an image",
-                });
+            if (typeof obj[prop] !== "string") {
+              // console.log((obj[prop] as any).filename);
+              // const ext = extension((obj[prop] as any).filename);
+              // if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg")
+              //   errors.push({
+              //     field: prop,
+              //     error: "The file must be an image",
+              //   });
             }
             break;
         }

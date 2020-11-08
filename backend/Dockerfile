@@ -15,7 +15,6 @@ COPY . .
 EXPOSE 4000
 
 
-# VOLUME [ "./.env.production:/app/.env" ]
 
 ENV NODE_ENV=production
 

@@ -22,7 +22,14 @@ import {
 import { MyContext } from "../types";
 import { IMAGE_MERT } from "../constants";
 import { extension } from "../utils/fileExtension";
-import { getManager, LessThan } from "typeorm";
+import {
+  FindConditions,
+  FindOneOptions,
+  getManager,
+  LessThan,
+  ObjectLiteral,
+} from "typeorm";
+import validator from "validator";
 
 @Resolver(Mert)
 export class MertsResolver {
@@ -57,14 +64,16 @@ export class MertsResolver {
         }).save();
 
         if (fields.picture) {
-          const imagePath = mert.id + extension(fields.picture.filename);
-          mert.picture = imagePath;
+          const picture = await fields.picture;
+          const imageName = mert.id + extension(picture.filename);
+          console.log(`http://localhost:4000/merts/${imageName}`);
+          mert.picture = `http://localhost:4000/merts/${imageName}`;
           mert.save();
 
           const success = await new Promise<boolean>((resolve, reject) =>
-            fields
-              .picture!.createReadStream()
-              .pipe(createWriteStream(imagePath))
+            picture
+              .createReadStream()
+              .pipe(createWriteStream(IMAGE_MERT(imageName)))
               .on("finish", () => resolve(true))
               .on("error", (e) => {
                 console.log(e);
@@ -105,14 +114,24 @@ export class MertsResolver {
     @Arg("mertId", { nullable: true }) mertId: string,
     @Arg("cursor", { nullable: true }) date: string
   ): Promise<Mert[]> {
+    const isDate = validator.toDate(date);
+
+    let conditions: ObjectLiteral = {
+      fatherId: mertId,
+      createdAt: LessThan(
+        date ? new Date(date) : new Date(Date.now()).toISOString()
+      ),
+    };
+    if (!isDate)
+      conditions = (qy: any) => {
+        console.log(qy);
+        qy.where(`\"Mert__user\".\"username\"=:username`, { username: date });
+      };
+    console.log(conditions);
+
     return Mert.find({
       take: 10,
-      where: {
-        fatherId: mertId,
-        createdAt: LessThan(
-          date ? new Date(date) : new Date(Date.now()).toISOString()
-        ),
-      },
+      where: conditions,
       relations: ["user"],
       order: {
         createdAt: "DESC",
