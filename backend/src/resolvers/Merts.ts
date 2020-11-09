@@ -114,20 +114,18 @@ export class MertsResolver {
     @Arg("mertId", { nullable: true }) mertId: string,
     @Arg("cursor", { nullable: true }) date: string
   ): Promise<Mert[]> {
-    const isDate = validator.toDate(date);
-
-    let conditions: ObjectLiteral = {
-      fatherId: mertId,
-      createdAt: LessThan(
-        date ? new Date(date) : new Date(Date.now()).toISOString()
-      ),
-    };
-    if (!isDate)
+    let conditions;
+    if (date && !validator.toDate(date))
       conditions = (qy: any) => {
-        console.log(qy);
         qy.where(`\"Mert__user\".\"username\"=:username`, { username: date });
       };
-    console.log(conditions);
+    else
+      conditions = {
+        fatherId: mertId,
+        createdAt: LessThan(
+          date ? new Date(date) : new Date(Date.now()).toISOString()
+        ),
+      };
 
     return Mert.find({
       take: 10,

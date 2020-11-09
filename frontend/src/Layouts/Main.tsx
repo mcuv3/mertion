@@ -38,7 +38,14 @@ const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         }}
       >
         <Link passHref href="/">
-          <RadarChartOutlined style={{ fontSize: "2.5rem", color: "white" }} />
+          <div style={{ display: "flex" }}>
+            <RadarChartOutlined
+              style={{ fontSize: "2.5rem", color: "white" }}
+            />
+            <Title style={{ color: "white", fontStyle: "italic" }} level={5}>
+              Mertion
+            </Title>
+          </div>
         </Link>
         {data?.me && !loading ? (
           <Button

@@ -18,9 +18,14 @@ export type Scalars = {
 export type Query = {
   __typename?: "Query";
   me?: Maybe<MeResponse>;
+  user?: Maybe<MeResponse>;
   mert?: Maybe<Mert>;
   merts?: Maybe<Array<Mert>>;
   usersReactions: UserReactionsResponse;
+};
+
+export type QueryUserArgs = {
+  username?: Maybe<Scalars["String"]>;
 };
 
 export type QueryMertArgs = {
@@ -46,6 +51,8 @@ export type MeResponse = {
   id?: Maybe<Scalars["String"]>;
   username?: Maybe<Scalars["String"]>;
   picture?: Maybe<Scalars["String"]>;
+  about?: Maybe<Scalars["String"]>;
+  name?: Maybe<Scalars["String"]>;
 };
 
 export type ErrorFieldClass = {
@@ -264,7 +271,7 @@ export type MeQuery = { __typename?: "Query" } & {
   me?: Maybe<
     { __typename?: "MeResponse" } & Pick<
       MeResponse,
-      "id" | "email" | "username" | "picture"
+      "id" | "email" | "username" | "picture" | "name" | "about"
     >
   >;
 };
@@ -295,6 +302,19 @@ export type MertsQueryVariables = Exact<{
 
 export type MertsQuery = { __typename?: "Query" } & {
   merts?: Maybe<Array<{ __typename?: "Mert" } & BaseMertFragment>>;
+};
+
+export type UserQueryVariables = Exact<{
+  username?: Maybe<Scalars["String"]>;
+}>;
+
+export type UserQuery = { __typename?: "Query" } & {
+  user?: Maybe<
+    { __typename?: "MeResponse" } & Pick<
+      MeResponse,
+      "name" | "about" | "username" | "email" | "picture"
+    >
+  >;
 };
 
 export type UserReactionsQueryVariables = Exact<{
@@ -620,6 +640,8 @@ export const MeDocument = gql`
       email
       username
       picture
+      name
+      about
     }
   }
 `;
@@ -757,6 +779,53 @@ export type MertsQueryResult = Apollo.QueryResult<
   MertsQuery,
   MertsQueryVariables
 >;
+export const UserDocument = gql`
+  query User($username: String) {
+    user(username: $username) {
+      name
+      about
+      username
+      email
+      picture
+    }
+  }
+`;
+
+/**
+ * __useUserQuery__
+ *
+ * To run a query within a React component, call `useUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserQuery({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<UserQuery, UserQueryVariables>
+) {
+  return Apollo.useQuery<UserQuery, UserQueryVariables>(
+    UserDocument,
+    baseOptions
+  );
+}
+export function useUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<UserQuery, UserQueryVariables>
+) {
+  return Apollo.useLazyQuery<UserQuery, UserQueryVariables>(
+    UserDocument,
+    baseOptions
+  );
+}
+export type UserQueryHookResult = ReturnType<typeof useUserQuery>;
+export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
+export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
 export const UserReactionsDocument = gql`
   query UserReactions($reaction: Reactions!, $mertId: String!) {
     usersReactions(reaction: $reaction, mertId: $mertId) {

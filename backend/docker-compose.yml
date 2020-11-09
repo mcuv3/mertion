@@ -6,40 +6,57 @@ services:
     command: npm run dev
     ports:
       - "4000:4000"
+    restart: always
     volumes:
+      - files:/app/dist/public
       - /app/node_modules
-      - /app/.env
       - .:/app
-    environment:
-      - ./.env
     networks:
-      - host
+      - development
+    environment:
+      - REDIS_URL=redis:6379
+      - DATABASE_URL=postgres://mcuve:secret@postgres:5432/mertion
+      - SESSION_SECRET=mysecret
+      - PORT=4000
+      - HOST_SERVER=http://localhost:4000/
+      - ORIGIN=http://localhost:3000
     depends_on:
       - postgres
       - redis
   postgres:
     image: postgres
     restart: always
+    networks:
+      - development
     environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=mert
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_USER=mcuve
+      - POSTGRES_DB=mertion
+    volumes:
+      - mertion-data=/var/lib/postgresql/data/pgdata
   redis:
     image: redis
     restart: always
     volumes:
       - redis_db:/data
+    networks:
+      - development
   web:
-    build: /mnt/3822EF8822EF4988/projects-web/mertion/frontend/
+    build: ../frontend/
     ports:
       - "3000:3000"
     volumes:
       - /web/node_modules
-      - /mnt/3822EF8822EF4988/projects-web/mertion/frontend:/web
+      - ../frontend:/web
+    networks:
+      - development
     depends_on:
       - app
 
 volumes:
   redis_db:
+  files:
+  mertion-data:
 
 networks:
-  host:
+  development:

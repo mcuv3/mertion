@@ -1,6 +1,8 @@
 import { Mert, useMertQuery, useMertsQuery } from "../../generated/graphql";
 import MainPost from "../../components/Mert";
 import { useRouter } from "next/router";
+import UserInfo from "../../components/UserInfo";
+import { relative } from "path";
 
 const UserPage = () => {
   const router = useRouter();
@@ -14,10 +16,24 @@ const UserPage = () => {
 
   console.log("RENDERED");
   return (
-    <div style={{ width: "100%" }}>
-      {merts?.merts?.map((m) => {
-        return <MainPost mert={m as Mert} key={m.id} />;
-      })}
+    <div
+      style={{
+        width: "100%",
+        display: "flex",
+        alignItems: "start",
+        position: "relative",
+        justifyContent: "center",
+        marginTop: "-1rem",
+      }}
+    >
+      <div style={{ position: "absolute", left: "-18rem" }}>
+        <UserInfo />
+      </div>
+      <div>
+        {merts?.merts?.map((m) => {
+          return <MainPost mert={m as Mert} key={m.id} />;
+        })}
+      </div>
     </div>
   );
 };

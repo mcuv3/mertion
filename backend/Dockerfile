@@ -4,8 +4,6 @@ LABEL author="mcuve"
 
 WORKDIR /app
 
-COPY .env.production .env
-
 COPY package.json .
 
 RUN npm i
@@ -15,8 +13,9 @@ COPY . .
 EXPOSE 4000
 
 
+# COPY .env.production .env
 
-ENV NODE_ENV=production
+# ENV NODE_ENV=production
 
 USER node
 
