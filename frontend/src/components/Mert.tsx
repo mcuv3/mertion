@@ -1,5 +1,5 @@
 import React, { createElement, useEffect, useState } from "react";
-import { Card, Comment, Space, Tooltip } from "antd";
+import { Avatar, Card, Comment, Space, Tooltip } from "antd";
 import dayjs from "../util/dayjs";
 import Image from "next/image";
 import {
@@ -17,12 +17,10 @@ import {
   useMeQuery,
   useReactMertMutation,
 } from "../generated/graphql";
-import { withApollo } from "../lib/withApollo";
 import { useRouter } from "next/router";
 
 import Reply from "./Reply";
 import { isAuth } from "../util/checkAuth";
-import { route } from "next/dist/next-server/server/router";
 
 interface Props {
   mert: Mert;
@@ -102,7 +100,7 @@ const MertComponent: React.FC<Props> = ({ mert, isFather }) => {
         // onClick={(e) => isAuth(router, me) && reaction(e, Reactions.DisLike)}
         >
           {React.createElement(MessageOutlined)}
-          <span className="comment-action">120</span>
+          <span className="comment-action">{mert.comments}</span>
         </span>
       </Tooltip>,
       <span
@@ -118,9 +116,6 @@ const MertComponent: React.FC<Props> = ({ mert, isFather }) => {
     ],
     [likes, dislikes, action]
   );
-
-  console.log(mert.picture);
-
   return (
     <Card hoverable>
       {reply && <Reply fatherMert={mert} close={() => setReply(!reply)} />}
@@ -142,7 +137,7 @@ const MertComponent: React.FC<Props> = ({ mert, isFather }) => {
               }}
               width="50px"
               height="50px"
-              src={mert.user.picture || ""}
+              src={mert?.user?.picture?.replace("localhost", "app") || ""}
               alt={mert.user.username || ""}
             />
 
@@ -154,32 +149,33 @@ const MertComponent: React.FC<Props> = ({ mert, isFather }) => {
           content={
             <>
               <p style={{ marginBottom: "1rem" }}>{mert.mert}</p>
-              {mert.picture && (
-                <div
-                  style={{
-                    width: "100%",
-                    backgroundColor: "#001529",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    backgroundSize: "contain",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "600px",
-                    display: "flex",
-                  }}
-                >
-                  {mert.picture !== "" && (
+
+              <div>
+                {mert.picture && (
+                  <div
+                    style={{
+                      width: "100%",
+                      backgroundColor: "transparent",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "contain",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      height: "600px",
+                      display: "flex",
+                    }}
+                  >
                     <Image
                       alt={mert.id}
-                      src={mert.picture || ""}
-                      width={500}
+                      src={mert.picture?.replace("localhost", "app") || ""}
+                      width={400}
                       height={500}
                       quality={100}
-                      sizes="(max-width: 600px) 100vw, (max-width: 1023px) 48vw, 18vw,(max-height: 500px) 1000px"
+                      //sizes="(max-width: 600px) 100vw, (max-width: 1023px) 48vw, 18vw,(max-height: 500px) 1000px"
                     />
-                  )}
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
             </>
           }
           datetime={

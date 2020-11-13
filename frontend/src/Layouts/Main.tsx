@@ -42,7 +42,14 @@ const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
             <RadarChartOutlined
               style={{ fontSize: "2.5rem", color: "white" }}
             />
-            <Title style={{ color: "white", fontStyle: "italic" }} level={5}>
+            <Title
+              style={{
+                color: "white",
+                fontStyle: "italic",
+                marginTop: "1.2rem",
+              }}
+              level={5}
+            >
               Mertion
             </Title>
           </div>
@@ -93,7 +100,7 @@ const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         {children}
       </Content>
       <Footer style={{ textAlign: "center" }}>
-        Mertion ©2018 Created by mcuve
+        Mertion ©2020 Created by mcuve
       </Footer>
     </Layout>
   );

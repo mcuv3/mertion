@@ -13,8 +13,6 @@ const UserPage = () => {
       mertId: null,
     },
   });
-
-  console.log("RENDERED");
   return (
     <div
       style={{
@@ -26,10 +24,10 @@ const UserPage = () => {
         marginTop: "-1rem",
       }}
     >
-      <div style={{ position: "absolute", left: "-18rem" }}>
+      <div style={{ position: "absolute", left: "-20rem" }}>
         <UserInfo />
       </div>
-      <div>
+      <div style={{ width: "100%" }}>
         {merts?.merts?.map((m) => {
           return <MainPost mert={m as Mert} key={m.id} />;
         })}

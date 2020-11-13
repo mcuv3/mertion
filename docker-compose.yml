@@ -2,52 +2,42 @@ version: "3.8"
 
 services:
   app:
-    build: .
-    command: npm run dev
+    build: ./backend
     ports:
       - "4000:4000"
-    restart: always
     volumes:
       - files:/app/dist/public
       - /app/node_modules
-      - .:/app
+      - ./backend:/app
     networks:
       - development
-    environment:
-      - REDIS_URL=redis:6379
-      - DATABASE_URL=postgres://mcuve:secret@postgres:5432/mertion
-      - SESSION_SECRET=mysecret
-      - PORT=4000
-      - HOST_SERVER=http://localhost:4000/
-      - ORIGIN=http://localhost:3000
+    env_file:
+      - ./env/backend.env
     depends_on:
       - postgres
       - redis
   postgres:
     image: postgres
-    restart: always
     networks:
       - development
-    environment:
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_USER=mcuve
-      - POSTGRES_DB=mertion
+    env_file:
+      - ./env/postgres.env
     volumes:
-      - mertion-data=/var/lib/postgresql/data/pgdata
+      - mertion-data:/var/lib/postgresql/data
   redis:
     image: redis
-    restart: always
     volumes:
       - redis_db:/data
     networks:
       - development
   web:
-    build: ../frontend/
+    build: ./frontend
     ports:
       - "3000:3000"
     volumes:
       - /web/node_modules
-      - ../frontend:/web
+      - ./frontend:/web
+    restart: always
     networks:
       - development
     depends_on:

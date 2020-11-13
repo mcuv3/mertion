@@ -1,4 +1,5 @@
 import { Avatar, Card, Typography } from "antd";
+
 import {
   SettingOutlined,
   EditOutlined,
@@ -19,6 +20,8 @@ const UserInfo = ({ router }: WithRouterProps) => {
         typeof router.query.user === "string" ? router.query.user : null,
     },
   });
+  
+  const {data:me} = useMeQuery();
 
   return (
     <Card
@@ -30,11 +33,11 @@ const UserInfo = ({ router }: WithRouterProps) => {
           src="http://localhost:4000/backgrounds/default.jpg"
         />
       }
-      actions={[
-        <SettingOutlined key="setting" />,
+      actions={ me?.me ? [
+        <SettingOutlined key="setting" onClick={()=>router.push(`/${me.me?.username}/config`)}/>,
         <EditOutlined key="edit" />,
         <EllipsisOutlined key="ellipsis" />,
-      ]}
+      ]:[]}
     >
       <Meta
         avatar={<Avatar src={user?.user?.picture || ""} />}

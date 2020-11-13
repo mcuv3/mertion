@@ -6,18 +6,30 @@ import {
   NormalizedCacheObject,
 } from "@apollo/client";
 import { NextPageContext } from "next";
-import {} from "../generated/graphql";
+
 import { createUploadLink } from "apollo-upload-client";
 
+console.log(
+  typeof window === "undefined"
+    ? process.env.SERVER_URL
+    : process.env.NEXT_PUBLIC_API_URL
+);
+
 const link = createUploadLink({
-  uri: process.env.NEXT_PUBLIC_API_URL,
+  uri:
+    typeof window === "undefined"
+      ? process.env.SERVER_URL
+      : process.env.NEXT_PUBLIC_API_URL,
   credentials: "include",
 });
 
 const createClient = (ctx: NextPageContext) =>
   new ApolloClient({
     link,
-    uri: process.env.NEXT_PUBLIC_API_URL as string,
+    uri:
+      typeof window === "undefined"
+        ? process.env.SERVER_URL
+        : process.env.NEXT_PUBLIC_API_URL,
     credentials: "include",
     headers: {
       cookie:

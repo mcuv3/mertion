@@ -9,4 +9,5 @@ fragment BaseMert on Mert {
     username
     picture
   }
+  comments
 }

@@ -52,4 +52,11 @@ export class Mert extends BaseEntity {
   @Field(() => Mert, { nullable: true })
   @OneToOne(() => Mert, { nullable: true })
   father?: Mert;
+
+  @Field(() => Number)
+  async comments() {
+    const [, n] = await Mert.findAndCount({ where: { fatherId: this.id } });
+    console.log(n);
+    return n;
+  }
 }

@@ -12,7 +12,7 @@ if (typeof require !== "undefined") {
 
 module.exports = {
   images: {
-    domains: ["localhost"],
+    domains: ["localhost", "http://app:4000", "app"],
   },
   ...withCSS({
     cssModules: true,

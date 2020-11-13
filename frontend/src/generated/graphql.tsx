@@ -73,6 +73,7 @@ export type Mert = {
   userId: Scalars["String"];
   user: User;
   father?: Maybe<Mert>;
+  comments: Scalars["Float"];
 };
 
 export type User = {
@@ -171,7 +172,7 @@ export type ReactionsMertResponse = {
 
 export type BaseMertFragment = { __typename?: "Mert" } & Pick<
   Mert,
-  "id" | "mert" | "likes" | "dislikes" | "picture" | "createdAt"
+  "id" | "mert" | "likes" | "dislikes" | "picture" | "createdAt" | "comments"
 > & { user: { __typename?: "User" } & Pick<User, "username" | "picture"> };
 
 export type CreateMertMutationVariables = Exact<{
@@ -345,6 +346,7 @@ export const BaseMertFragmentDoc = gql`
       username
       picture
     }
+    comments
   }
 `;
 export const CreateMertDocument = gql`
@@ -858,7 +860,7 @@ export const UserReactionsDocument = gql`
  * });
  */
 export function useUserReactionsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     UserReactionsQuery,
     UserReactionsQueryVariables
   >
