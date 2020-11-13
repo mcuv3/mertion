@@ -1,6 +1,6 @@
 import { message } from "antd";
 
-export function getBase64(img, callback) {
+export function getBase64(img: any, callback: any) {
   const reader = new FileReader();
   reader.addEventListener("load", () => {
     callback(reader.result);
@@ -8,7 +8,7 @@ export function getBase64(img, callback) {
   reader.readAsDataURL(img);
 }
 
-export function beforeUpload(file) {
+export function beforeUpload(file: any) {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
   if (!isJpgOrPng) {
     message.error("Only images are allowed");

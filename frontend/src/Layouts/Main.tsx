@@ -38,7 +38,7 @@ const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         }}
       >
         <Link passHref href="/">
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex", cursor: "pointer" }}>
             <RadarChartOutlined
               style={{ fontSize: "2.5rem", color: "white" }}
             />
