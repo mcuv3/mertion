@@ -18,7 +18,7 @@ export class Mert extends BaseEntity {
   id!: string;
 
   @Field()
-  @Column("varchar", { length: "144" })
+  @Column("varchar", { length: "155" })
   mert!: string;
 
   @Field()
@@ -56,7 +56,6 @@ export class Mert extends BaseEntity {
   @Field(() => Number)
   async comments() {
     const [, n] = await Mert.findAndCount({ where: { fatherId: this.id } });
-    console.log(n);
     return n;
   }
 }

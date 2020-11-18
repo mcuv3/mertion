@@ -1,32 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { withApollo } from "../../lib/withApollo";
-import { useMeQuery } from "../../generated/graphql";
-import { Button, Form, Input, Upload } from "antd";
+import {
+  UpdateProfileMutationVariables,
+  useMeQuery,
+  useUpdateProfileMutation,
+} from "../../generated/graphql";
+import { Button, Form, Input } from "antd";
 import { withRouter } from "next/router";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { useFormErrors } from "../../hooks/useFormErrors";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
-import { beforeUpload, getBase64 } from "../../validation/validation";
-import { UploadChangeParam } from "antd/lib/upload";
-import { UploadFile } from "antd/lib/upload/interface";
-//import ImgCrop from 'antd-img-crop';
+import SelectUpload from "../../components/SelectUpload";
 const layout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 24 },
 };
-function getFile(file: any) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-}
+
 export const ConfigUser = ({ router }: WithRouterProps) => {
   const { data: me, loading: meLoading } = useMeQuery();
-  const [loading, setLoading] = useState(false);
-  const { form } = useFormErrors({ success: () => {}, response: {} });
+  const [updateProfile, { data }] = useUpdateProfileMutation();
+  const { form } = useFormErrors({
+    success: () => {},
+    response: data?.changeProfile,
+  });
   const [image, setImage] = useState<{ url: string; file?: Blob }>();
+  const [imageBg, setImageBg] = useState<{ url: string; file?: Blob }>();
 
   useEffect(() => {
     if (router.query.user !== me?.me?.username && !meLoading) {
@@ -36,34 +33,24 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
         { name: "username", value: me?.me?.username },
         { name: "name", value: me?.me?.name },
         { name: "about", value: me?.me?.about },
+        { name: "age", value: me?.me?.age },
       ]);
       setImage({ url: me!.me!.picture as string });
     }
   }, [me?.me]);
 
-  const handleChange = (info: UploadChangeParam<UploadFile<any>>) => {
-    if (info.file.status === "uploading") {
-      setLoading(true);
-      return;
-    }
-    if (info.file.status === "done") {
-      getBase64(info.file.originFileObj, (imageUrl: any) => {
-        setLoading(false);
-        setImage({
-          file: info.file.originFileObj,
-          url: imageUrl,
-        });
-      });
-    }
-  };
+  const onFinish = async (fields: UpdateProfileMutationVariables) =>
+    updateProfile({
+      variables: {
+        ...fields,
+        age: +fields.age || 0,
+        picture: image?.file,
+        bg_picture: imageBg?.file,
+      },
+    });
 
-  const uploadButton = (
-    <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Profile photo</div>
-    </div>
-  );
-
+  // TODO: Set the bg image in the preview when is loaded
+  // TODO: Update the query for merts and for user to update the images if needed
   return (
     <div
       style={{
@@ -81,26 +68,25 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
           alignItems: "center",
         }}
       >
-        <div style={{ alignSelf: "start", justifySelf: "start" }}>
-          <Upload
-            name="avatar"
-            listType="picture-card"
-            className="avatar-uploader"
-            showUploadList={false}
-            multiple={false}
-            beforeUpload={beforeUpload}
-            onChange={handleChange}
-          >
-            {image?.url ? (
-              <img
-                src={image.url}
-                alt="avatar"
-                style={{ width: "100%", height: "100%" }}
-              />
-            ) : (
-              uploadButton
-            )}
-          </Upload>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            flexDirection: "column",
+          }}
+        >
+          <SelectUpload
+            label="Profile Photo"
+            image={image}
+            setImage={setImage}
+            key={1}
+          />
+          <SelectUpload
+            label="Background Photo"
+            image={imageBg}
+            setImage={setImageBg}
+            key={2}
+          />
         </div>
         <Form {...layout} size="middle" form={form} style={{ width: "100%" }}>
           <Form.Item name="name" label="Name" rules={[{ required: true }]}>
@@ -113,6 +99,9 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
           >
             <Input placeholder="username" />
           </Form.Item>
+          <Form.Item name="age" label="Age" rules={[{ required: true }]}>
+            <Input placeholder="18+" />
+          </Form.Item>
           <Form.Item name="about" label="About me">
             <Input.TextArea
               placeholder="About you"
@@ -122,7 +111,9 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
           </Form.Item>
         </Form>
       </div>
-      <Button type="primary">Update Profile</Button>
+      <Button type="primary" onClick={() => onFinish(form.getFieldsValue())}>
+        Update Profile
+      </Button>
     </div>
   );
 };

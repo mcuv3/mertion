@@ -3,7 +3,6 @@ import {
   BaseEntity,
   Column,
   Entity,
-  Generated,
   OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
@@ -44,6 +43,12 @@ export class User extends BaseEntity {
   @Field({ nullable: true })
   @Column("varchar")
   picture!: string;
+
+  @Field({ nullable: true })
+  @Column("varchar", {
+    default: process.env.HOST_SERVER + "/backgrounds/default.jpg",
+  })
+  backgroundPicture?: string;
 
   @OneToMany(() => Mert, (m) => m.user)
   merts!: Mert[];

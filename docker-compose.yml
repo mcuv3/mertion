@@ -6,11 +6,8 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - files:/app/dist/public
       - /app/node_modules
       - ./backend:/app
-    networks:
-      - development
     env_file:
       - ./env/backend.env
     depends_on:
@@ -18,8 +15,6 @@ services:
       - redis
   postgres:
     image: postgres
-    networks:
-      - development
     env_file:
       - ./env/postgres.env
     volumes:
@@ -28,8 +23,6 @@ services:
     image: redis
     volumes:
       - redis_db:/data
-    networks:
-      - development
   web:
     build: ./frontend
     ports:
@@ -38,15 +31,11 @@ services:
       - /web/node_modules
       - ./frontend:/web
     restart: always
-    networks:
-      - development
     depends_on:
       - app
 
 volumes:
   redis_db:
-  files:
   mertion-data:
-
-networks:
-  development:
+  # files:
+  # files-dev:

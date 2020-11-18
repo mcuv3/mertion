@@ -5,5 +5,7 @@ query User($username: String) {
     username
     email
     picture
+    age
+    backgroundPicture
   }
 }

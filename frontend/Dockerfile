@@ -10,6 +10,8 @@ RUN npm i
 
 COPY . .
 
+USER node
+
 EXPOSE 3000
 
 

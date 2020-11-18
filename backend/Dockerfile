@@ -17,7 +17,7 @@ EXPOSE 4000
 
 # ENV NODE_ENV=production
 
-#USER node
+USER node
 
 
 CMD ["npm","run","dev"]

@@ -9,5 +9,10 @@ mutation Login($email: String!, $password: String!) {
     email
     username
     picture
+    age
+    about
+    name
+    id
+    backgroundPicture
   }
 }

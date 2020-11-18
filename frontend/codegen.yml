@@ -1,5 +1,5 @@
 overwrite: true
-schema: "http://app:4000/graphql" # your schema for dev
+schema: "http://localhost:4000/graphql" # your schema for dev
 documents: "src/graphql/**/*.graphql"
 generates:
   src/generated/graphql.tsx:

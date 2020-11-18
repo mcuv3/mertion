@@ -119,7 +119,7 @@ const SingUp = () => {
           label="Password"
           rules={[{ required: true }]}
         >
-          <Input placeholder="ej 1234." />
+          <Input.Password placeholder="ej 1234." />
         </Form.Item>
         <Form.Item
           name="username"

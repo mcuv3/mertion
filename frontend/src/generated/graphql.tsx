@@ -47,12 +47,14 @@ export type MeResponse = {
   success: Scalars["Boolean"];
   message?: Maybe<Scalars["String"]>;
   errors?: Maybe<Array<ErrorFieldClass>>;
-  email?: Maybe<Scalars["String"]>;
-  id?: Maybe<Scalars["String"]>;
-  username?: Maybe<Scalars["String"]>;
-  picture?: Maybe<Scalars["String"]>;
-  about?: Maybe<Scalars["String"]>;
-  name?: Maybe<Scalars["String"]>;
+  email: Scalars["String"];
+  id: Scalars["String"];
+  username: Scalars["String"];
+  picture: Scalars["String"];
+  about: Scalars["String"];
+  name: Scalars["String"];
+  backgroundPicture: Scalars["String"];
+  age: Scalars["Float"];
 };
 
 export type ErrorFieldClass = {
@@ -86,6 +88,7 @@ export type User = {
   password: Scalars["String"];
   about: Scalars["String"];
   picture?: Maybe<Scalars["String"]>;
+  backgroundPicture?: Maybe<Scalars["String"]>;
 };
 
 export type UserReactionsResponse = {
@@ -109,6 +112,7 @@ export type Mutation = {
   logout: Scalars["Boolean"];
   createMert: MertCreationResponse;
   reactMert?: Maybe<ReactionsMertResponse>;
+  changeProfile: StandardResponse;
 };
 
 export type MutationSignUpArgs = {
@@ -127,6 +131,12 @@ export type MutationCreateMertArgs = {
 export type MutationReactMertArgs = {
   mertId: Scalars["String"];
   reaction: Reactions;
+};
+
+export type MutationChangeProfileArgs = {
+  bg_picture?: Maybe<Scalars["Upload"]>;
+  profile_picture?: Maybe<Scalars["Upload"]>;
+  fields: ChangeProfileInput;
 };
 
 export type SignUpResponse = {
@@ -170,6 +180,20 @@ export type ReactionsMertResponse = {
   dislikes: Array<Scalars["String"]>;
 };
 
+export type StandardResponse = {
+  __typename?: "StandardResponse";
+  success: Scalars["Boolean"];
+  message?: Maybe<Scalars["String"]>;
+  errors?: Maybe<Array<ErrorFieldClass>>;
+};
+
+export type ChangeProfileInput = {
+  username: Scalars["String"];
+  name: Scalars["String"];
+  age: Scalars["Int"];
+  about?: Maybe<Scalars["String"]>;
+};
+
 export type BaseMertFragment = { __typename?: "Mert" } & Pick<
   Mert,
   "id" | "mert" | "likes" | "dislikes" | "picture" | "createdAt" | "comments"
@@ -206,7 +230,16 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = { __typename?: "Mutation" } & {
   logIn: { __typename?: "MeResponse" } & Pick<
     MeResponse,
-    "success" | "message" | "email" | "username" | "picture"
+    | "success"
+    | "message"
+    | "email"
+    | "username"
+    | "picture"
+    | "age"
+    | "about"
+    | "name"
+    | "id"
+    | "backgroundPicture"
   > & {
       errors?: Maybe<
         Array<
@@ -266,13 +299,45 @@ export type SignUpMutation = { __typename?: "Mutation" } & {
     };
 };
 
+export type UpdateProfileMutationVariables = Exact<{
+  picture?: Maybe<Scalars["Upload"]>;
+  bg_picture?: Maybe<Scalars["Upload"]>;
+  name: Scalars["String"];
+  username: Scalars["String"];
+  age: Scalars["Int"];
+  about?: Maybe<Scalars["String"]>;
+}>;
+
+export type UpdateProfileMutation = { __typename?: "Mutation" } & {
+  changeProfile: { __typename?: "StandardResponse" } & Pick<
+    StandardResponse,
+    "success" | "message"
+  > & {
+      errors?: Maybe<
+        Array<
+          { __typename?: "ErrorFieldClass" } & Pick<
+            ErrorFieldClass,
+            "field" | "error"
+          >
+        >
+      >;
+    };
+};
+
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = { __typename?: "Query" } & {
   me?: Maybe<
     { __typename?: "MeResponse" } & Pick<
       MeResponse,
-      "id" | "email" | "username" | "picture" | "name" | "about"
+      | "id"
+      | "name"
+      | "email"
+      | "username"
+      | "picture"
+      | "age"
+      | "about"
+      | "backgroundPicture"
     >
   >;
 };
@@ -313,7 +378,13 @@ export type UserQuery = { __typename?: "Query" } & {
   user?: Maybe<
     { __typename?: "MeResponse" } & Pick<
       MeResponse,
-      "name" | "about" | "username" | "email" | "picture"
+      | "name"
+      | "about"
+      | "username"
+      | "email"
+      | "picture"
+      | "age"
+      | "backgroundPicture"
     >
   >;
 };
@@ -424,6 +495,11 @@ export const LoginDocument = gql`
       email
       username
       picture
+      age
+      about
+      name
+      id
+      backgroundPicture
     }
   }
 `;
@@ -635,15 +711,89 @@ export type SignUpMutationOptions = Apollo.BaseMutationOptions<
   SignUpMutation,
   SignUpMutationVariables
 >;
+export const UpdateProfileDocument = gql`
+  mutation updateProfile(
+    $picture: Upload
+    $bg_picture: Upload
+    $name: String!
+    $username: String!
+    $age: Int!
+    $about: String
+  ) {
+    changeProfile(
+      profile_picture: $picture
+      bg_picture: $bg_picture
+      fields: { username: $username, name: $name, about: $about, age: $age }
+    ) {
+      success
+      message
+      errors {
+        field
+        error
+      }
+    }
+  }
+`;
+export type UpdateProfileMutationFn = Apollo.MutationFunction<
+  UpdateProfileMutation,
+  UpdateProfileMutationVariables
+>;
+
+/**
+ * __useUpdateProfileMutation__
+ *
+ * To run a mutation, you first call `useUpdateProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProfileMutation, { data, loading, error }] = useUpdateProfileMutation({
+ *   variables: {
+ *      picture: // value for 'picture'
+ *      bg_picture: // value for 'bg_picture'
+ *      name: // value for 'name'
+ *      username: // value for 'username'
+ *      age: // value for 'age'
+ *      about: // value for 'about'
+ *   },
+ * });
+ */
+export function useUpdateProfileMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UpdateProfileMutation,
+    UpdateProfileMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    UpdateProfileMutation,
+    UpdateProfileMutationVariables
+  >(UpdateProfileDocument, baseOptions);
+}
+export type UpdateProfileMutationHookResult = ReturnType<
+  typeof useUpdateProfileMutation
+>;
+export type UpdateProfileMutationResult = Apollo.MutationResult<
+  UpdateProfileMutation
+>;
+export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<
+  UpdateProfileMutation,
+  UpdateProfileMutationVariables
+>;
 export const MeDocument = gql`
   query Me {
     me {
       id
+      name
       email
       username
       picture
+      age
       name
       about
+      backgroundPicture
     }
   }
 `;
@@ -789,6 +939,8 @@ export const UserDocument = gql`
       username
       email
       picture
+      age
+      backgroundPicture
     }
   }
 `;
@@ -860,7 +1012,7 @@ export const UserReactionsDocument = gql`
  * });
  */
 export function useUserReactionsQuery(
-  baseOptions: Apollo.QueryHookOptions<
+  baseOptions?: Apollo.QueryHookOptions<
     UserReactionsQuery,
     UserReactionsQueryVariables
   >

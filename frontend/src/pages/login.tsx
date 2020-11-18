@@ -3,13 +3,11 @@ import { Form, Input, Button, Checkbox } from "antd";
 
 import { withApollo } from "../lib/withApollo";
 import { useFormErrors } from "../hooks/useFormErrors";
-import { globalApolloClient } from "../lib/createWithApollo";
 import {
   LoginMutationVariables,
   MeDocument,
   MeQuery,
   useLoginMutation,
-  useMeLazyQuery,
 } from "../generated/graphql";
 
 const layout = {
@@ -22,6 +20,7 @@ const tailLayout = {
 
 const Login = () => {
   const [login, { data, loading }] = useLoginMutation({
+    notifyOnNetworkStatusChange: true,
     update: (cache, { data }) => {
       if (data?.logIn.success)
         cache.writeQuery<MeQuery>({
@@ -32,6 +31,10 @@ const Login = () => {
               email: data.logIn.email,
               picture: data.logIn.picture,
               username: data.logIn.username,
+              age: data.logIn.age,
+              about: data.logIn.about,
+              name: data.logIn.name,
+              id: data.logIn.id,
             },
           },
         });

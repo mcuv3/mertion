@@ -1,4 +1,4 @@
-import { ErrorField } from "../error/ErrorResponse";
+import { ErrorField } from "../error/StandardResponse";
 import { registeredValidators, ValidationFields } from "./validator_config";
 import v from "validator";
 import { extension } from "../utils/fileExtension";

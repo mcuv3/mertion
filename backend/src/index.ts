@@ -18,20 +18,16 @@ import {
 import path from "path";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
-import { Auth } from "./resolvers/Auth";
+import { Auth } from "./resolvers/AuthResolver";
 import { User, Mert } from "./entities/index";
 import { graphqlUploadExpress } from "graphql-upload";
 import { customAuthChecker } from "./middlewares/is-Auth";
-import { MertsResolver } from "./resolvers/Merts";
-import {
-  ApolloServerPluginUsageReporting,
-  AuthenticationError,
-} from "apollo-server-core";
+import { MertsResolver } from "./resolvers/MertResolver";
 import { mertLoader } from "./DataLoader/MertLoader";
 import { MyContext } from "./types";
+import { UserResolver } from "./resolvers/UserResolver";
 
 const main = async () => {
-  // SET UP CONNECTION TO THE DATABASE THROUGH TYPEORM
   const db = await createConnection({
     type: "postgres",
     entities: [User, Mert],
@@ -52,7 +48,7 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: ["http://localhost:3000", "http://web:3000"],
+      origin: ["http://web:3000", "http://localhost:3000"],
     })
   );
   app.use(
@@ -80,7 +76,7 @@ const main = async () => {
 
     schema: await buildSchema({
       authChecker: customAuthChecker,
-      resolvers: [Auth, MertsResolver],
+      resolvers: [Auth, MertsResolver, UserResolver],
       validate: false,
     }),
     context: ({ req, res }: MyContext) => ({
@@ -107,7 +103,7 @@ const main = async () => {
     cors: false,
   });
 
-  app.listen(PORT, (e) => {
+  app.listen(PORT, () => {
     console.log(`Available at http://localhost:${PORT}/graphql`);
   });
 };
@@ -115,8 +111,4 @@ const main = async () => {
 main().catch((e) => {
   console.log(e);
   console.error("CANNOT INITIALIZE THE SERVER");
-});
-
-process.on("unhandledRejection", () => {
-  process.exit();
 });

@@ -10,8 +10,7 @@ declare namespace NodeJS {
 
 declare namespace Express {
   export interface Request {
-    isAuth: boolean;
-    user: {
+    session: {
       email: string;
       username: string;
       picture: string;

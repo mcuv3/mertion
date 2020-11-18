@@ -1,0 +1,21 @@
+mutation updateProfile(
+  $picture: Upload
+  $bg_picture: Upload
+  $name: String!
+  $username: String!
+  $age: Int!
+  $about: String
+) {
+  changeProfile(
+    profile_picture: $picture
+    bg_picture: $bg_picture
+    fields: { username: $username, name: $name, about: $about, age: $age }
+  ) {
+    success
+    message
+    errors {
+      field
+      error
+    }
+  }
+}
