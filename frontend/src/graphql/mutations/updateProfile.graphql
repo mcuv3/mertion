@@ -17,5 +17,7 @@ mutation updateProfile(
       field
       error
     }
+    picture
+    backgroundImageUrl
   }
 }

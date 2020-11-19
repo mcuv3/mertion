@@ -35,6 +35,8 @@ const Login = () => {
               about: data.logIn.about,
               name: data.logIn.name,
               id: data.logIn.id,
+              backgroundPicture:data.logIn.backgroundPicture
+
             },
           },
         });

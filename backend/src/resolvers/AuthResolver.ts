@@ -40,14 +40,15 @@ export class Auth {
     };
   }
 
-  @Query(() => MeResponse, { nullable: true })
+  @Query(() => User, { nullable: true })
   async user(
     @Arg("username", { nullable: true }) username: string
-  ): Promise<MeResponse | null> {
+  ): Promise<Partial<User> | null> {
     if (!username) return null;
     const user = await User.findOne({ where: { username } });
     if (!user) return null;
     return {
+      id: user.id,
       email: user.email,
       backgroundPicture: user.backgroundPicture,
       about: user.about,

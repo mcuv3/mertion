@@ -7,6 +7,7 @@ query Mert($mertId: String) {
       likes
       dislikes
       user {
+        id
         username
         picture
       }

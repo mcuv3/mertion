@@ -5,7 +5,7 @@ import {
   EllipsisOutlined,
 } from "@ant-design/icons";
 import React from "react";
-import { useMeQuery, useMertQuery, useUserQuery } from "../generated/graphql";
+import { useMeQuery, useUserQuery } from "../generated/graphql";
 import { withRouter } from "next/router";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { route } from "next/dist/next-server/server/router";
@@ -21,6 +21,7 @@ const UserInfo = ({ router }: WithRouterProps) => {
   });
 
   const { data: me } = useMeQuery();
+  console.log(user);
 
   if (!user && !loading) router.push("/404");
 
@@ -32,9 +33,8 @@ const UserInfo = ({ router }: WithRouterProps) => {
         <img
           alt="example"
           src={
-            user?.user
-              ? user.user.backgroundPicture
-              : "http://localhost:4000/backgrounds/default.jpg"
+            user?.user?.backgroundPicture ||
+            "http://localhost:4000/backgrounds/default.jpg"
           }
         />
       }

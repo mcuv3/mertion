@@ -4,13 +4,13 @@ import { toBackgroundsPath, toProfilePath } from "../constants";
 import { User } from "../entities";
 import { StandardResponse } from "../error/StandardResponse";
 import { MyContext, Upload } from "../types";
-import { ChangeProfileInput } from "../types/UserTypes";
+import { ChangeProfileInput, UserUpdated } from "../types/UserTypes";
 import { saveFile } from "../utils/saveFile";
 
 @Resolver()
 export class UserResolver {
   @Authorized()
-  @Mutation(() => StandardResponse)
+  @Mutation(() => UserUpdated)
   async changeProfile(
     @Arg("fields") fields: ChangeProfileInput,
     @Arg("profile_picture", () => GraphQLUpload, { nullable: true })
@@ -18,7 +18,7 @@ export class UserResolver {
     @Arg("bg_picture", () => GraphQLUpload, { nullable: true })
     pictureBg: Upload,
     @Ctx() { req }: MyContext
-  ): Promise<StandardResponse> {
+  ): Promise<UserUpdated> {
     const errors = new ChangeProfileInput(fields).validate();
 
     if (errors.length > 0)
@@ -30,7 +30,6 @@ export class UserResolver {
       about: fields.about,
       age: fields.age,
     };
-    let messageResponse: string | undefined;
 
     if (picture) {
       const { success, message, url } = await saveFile(
@@ -54,8 +53,11 @@ export class UserResolver {
         toBackgroundsPath,
         "backgrounds"
       );
-      console.log(success, message, url);
-      if (!success) messageResponse = message;
+      if (!success)
+        return {
+          success,
+          message,
+        };
       updates["backgroundPicture"] = url;
     }
 
@@ -63,7 +65,9 @@ export class UserResolver {
 
     return {
       success: true,
-      message: messageResponse || "Updated Successfully",
+      message: "Updated Successfully",
+      backgroundImageUrl: updates["backgroundPicture"],
+      picture: updates["picture"],
     };
   }
 }

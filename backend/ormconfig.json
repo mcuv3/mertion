@@ -7,5 +7,9 @@
   "password": "maotrix1",
   "database": "selling-point",
   "entities": ["dist/entities/**/*.js"],
-  "migrations": ["dist/migrations/*.js"]
+  "migrations": ["dist/migrations/*.js"],
+  "cli": {
+    "entitiesDir": "src/entities",
+    "migrationsDir": "src/migrations"
+  }
 }

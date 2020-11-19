@@ -18,7 +18,7 @@ export type Scalars = {
 export type Query = {
   __typename?: "Query";
   me?: Maybe<MeResponse>;
-  user?: Maybe<MeResponse>;
+  user?: Maybe<User>;
   mert?: Maybe<Mert>;
   merts?: Maybe<Array<Mert>>;
   usersReactions: UserReactionsResponse;
@@ -63,6 +63,19 @@ export type ErrorFieldClass = {
   error: Scalars["String"];
 };
 
+export type User = {
+  __typename?: "User";
+  id: Scalars["String"];
+  name: Scalars["String"];
+  username: Scalars["String"];
+  age: Scalars["Int"];
+  email: Scalars["String"];
+  password: Scalars["String"];
+  about: Scalars["String"];
+  picture?: Maybe<Scalars["String"]>;
+  backgroundPicture?: Maybe<Scalars["String"]>;
+};
+
 export type Mert = {
   __typename?: "Mert";
   id: Scalars["String"];
@@ -76,19 +89,6 @@ export type Mert = {
   user: User;
   father?: Maybe<Mert>;
   comments: Scalars["Float"];
-};
-
-export type User = {
-  __typename?: "User";
-  id: Scalars["String"];
-  name: Scalars["String"];
-  username: Scalars["String"];
-  age: Scalars["Int"];
-  email: Scalars["String"];
-  password: Scalars["String"];
-  about: Scalars["String"];
-  picture?: Maybe<Scalars["String"]>;
-  backgroundPicture?: Maybe<Scalars["String"]>;
 };
 
 export type UserReactionsResponse = {
@@ -112,7 +112,7 @@ export type Mutation = {
   logout: Scalars["Boolean"];
   createMert: MertCreationResponse;
   reactMert?: Maybe<ReactionsMertResponse>;
-  changeProfile: StandardResponse;
+  changeProfile: UserUpdated;
 };
 
 export type MutationSignUpArgs = {
@@ -180,11 +180,13 @@ export type ReactionsMertResponse = {
   dislikes: Array<Scalars["String"]>;
 };
 
-export type StandardResponse = {
-  __typename?: "StandardResponse";
+export type UserUpdated = {
+  __typename?: "UserUpdated";
   success: Scalars["Boolean"];
   message?: Maybe<Scalars["String"]>;
   errors?: Maybe<Array<ErrorFieldClass>>;
+  picture?: Maybe<Scalars["String"]>;
+  backgroundImageUrl?: Maybe<Scalars["String"]>;
 };
 
 export type ChangeProfileInput = {
@@ -197,7 +199,9 @@ export type ChangeProfileInput = {
 export type BaseMertFragment = { __typename?: "Mert" } & Pick<
   Mert,
   "id" | "mert" | "likes" | "dislikes" | "picture" | "createdAt" | "comments"
-> & { user: { __typename?: "User" } & Pick<User, "username" | "picture"> };
+> & {
+    user: { __typename?: "User" } & Pick<User, "id" | "username" | "picture">;
+  };
 
 export type CreateMertMutationVariables = Exact<{
   mert: Scalars["String"];
@@ -309,9 +313,9 @@ export type UpdateProfileMutationVariables = Exact<{
 }>;
 
 export type UpdateProfileMutation = { __typename?: "Mutation" } & {
-  changeProfile: { __typename?: "StandardResponse" } & Pick<
-    StandardResponse,
-    "success" | "message"
+  changeProfile: { __typename?: "UserUpdated" } & Pick<
+    UserUpdated,
+    "success" | "message" | "picture" | "backgroundImageUrl"
   > & {
       errors?: Maybe<
         Array<
@@ -354,7 +358,10 @@ export type MertQuery = { __typename?: "Query" } & {
           Mert,
           "id" | "createdAt" | "likes" | "dislikes"
         > & {
-            user: { __typename?: "User" } & Pick<User, "username" | "picture">;
+            user: { __typename?: "User" } & Pick<
+              User,
+              "id" | "username" | "picture"
+            >;
           }
       >;
     } & BaseMertFragment
@@ -376,8 +383,9 @@ export type UserQueryVariables = Exact<{
 
 export type UserQuery = { __typename?: "Query" } & {
   user?: Maybe<
-    { __typename?: "MeResponse" } & Pick<
-      MeResponse,
+    { __typename?: "User" } & Pick<
+      User,
+      | "id"
       | "name"
       | "about"
       | "username"
@@ -414,6 +422,7 @@ export const BaseMertFragmentDoc = gql`
     picture
     createdAt
     user {
+      id
       username
       picture
     }
@@ -731,6 +740,8 @@ export const UpdateProfileDocument = gql`
         field
         error
       }
+      picture
+      backgroundImageUrl
     }
   }
 `;
@@ -839,6 +850,7 @@ export const MertDocument = gql`
         likes
         dislikes
         user {
+          id
           username
           picture
         }
@@ -934,6 +946,7 @@ export type MertsQueryResult = Apollo.QueryResult<
 export const UserDocument = gql`
   query User($username: String) {
     user(username: $username) {
+      id
       name
       about
       username

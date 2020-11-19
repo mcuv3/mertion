@@ -1,4 +1,5 @@
-import { Field, InputType, Int } from "type-graphql";
+import { Field, InputType, Int, ObjectType } from "type-graphql";
+import { StandardResponse } from "../error/StandardResponse";
 import { Validator } from "../validation/Validator";
 import { Length, Required } from "../validation/validator_config";
 
@@ -29,4 +30,12 @@ export class ChangeProfileInput extends Validator {
     super();
     this.fields = fields;
   }
+}
+
+@ObjectType()
+export class UserUpdated extends StandardResponse {
+  @Field({ nullable: true })
+  picture?: string;
+  @Field({ nullable: true })
+  backgroundImageUrl?: string;
 }

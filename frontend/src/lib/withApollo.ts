@@ -37,11 +37,11 @@ const createClient = (ctx: NextPageContext) =>
           : undefined) || "",
     },
     cache: new InMemoryCache({
-      typePolicies: {
-        Query: {
-          fields: {},
-        },
-      },
+      // typePolicies: {
+      //   // Query: {
+      //   //   fields: {},
+      //   // },
+      // },
     }),
   });
 

@@ -2,7 +2,7 @@ import { toProfilePath } from "../constants";
 import { Upload, UserCookie } from "../types";
 import { extension } from "./fileExtension";
 import { Request } from "express";
-import { createWriteStream, unlinkSync, stat } from "fs";
+import { createWriteStream, unlinkSync, existsSync } from "fs";
 
 interface SaveResult {
   success: boolean;
@@ -22,8 +22,7 @@ export const saveFile = async (
   try {
     if (isGoodFile) {
       const path = sendTo(user.username + ".jpg");
-
-      unlinkSync(path);
+      if (existsSync(path)) unlinkSync(path);
 
       const success = await new Promise<boolean>((resolve, reject) =>
         file

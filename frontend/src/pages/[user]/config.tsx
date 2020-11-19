@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { withApollo } from "../../lib/withApollo";
 import {
+  MertsDocument,
+  MertsQuery,
   UpdateProfileMutationVariables,
   useMeQuery,
+  UserDocument,
+  UserQuery,
   useUpdateProfileMutation,
 } from "../../generated/graphql";
 import { Button, Form, Input } from "antd";
@@ -10,6 +14,7 @@ import { withRouter } from "next/router";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { useFormErrors } from "../../hooks/useFormErrors";
 import SelectUpload from "../../components/SelectUpload";
+import { gql } from "@apollo/client";
 const layout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 24 },
@@ -17,16 +22,58 @@ const layout = {
 
 export const ConfigUser = ({ router }: WithRouterProps) => {
   const { data: me, loading: meLoading } = useMeQuery();
-  const [updateProfile, { data }] = useUpdateProfileMutation();
+  const [image, setImage] = useState<{ url: string; file?: Blob }>();
+  const [imageBg, setImageBg] = useState<{ url: string; file?: Blob }>();
+  const [updateProfile, { data }] = useUpdateProfileMutation({
+    update: (cache, { data }) => {
+      if (data?.changeProfile.success && me?.me) {
+        const fragments = {
+          fragment: gql`
+            fragment ___ on User {
+              about
+              name
+              picture
+              username
+              backgroundPicture
+            }
+          `,
+          data: {
+            about: form.getFieldValue("about"),
+            name: form.getFieldValue("name"),
+            picture: data.changeProfile.picture || me.me.picture,
+            username: form.getFieldValue("username"),
+            backgroundPicture:
+              data.changeProfile.backgroundImageUrl || me.me.backgroundPicture,
+            age: form.getFieldValue("age"),
+          },
+        };
+        cache.writeFragment({
+          id: "User:" + me.me.id,
+          ...fragments,
+        });
+
+        cache.writeFragment({
+          id: "MeResponse:" + me.me.id,
+          ...fragments,
+          fragment: gql`
+            fragment _me on MeResponse {
+              about
+              name
+              picture
+              username
+              backgroundPicture
+            }
+          `,
+        });
+      }
+    },
+  });
   const { form } = useFormErrors({
     success: () => {},
     response: data?.changeProfile,
   });
-  const [image, setImage] = useState<{ url: string; file?: Blob }>();
-  const [imageBg, setImageBg] = useState<{ url: string; file?: Blob }>();
-
   useEffect(() => {
-    if (router.query.user !== me?.me?.username && !meLoading) {
+    if (router.query.user !== me?.me?.username || (!me?.me && !meLoading)) {
       router.push("/");
     } else if (me?.me) {
       form.setFields([
@@ -36,6 +83,7 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
         { name: "age", value: me?.me?.age },
       ]);
       setImage({ url: me!.me!.picture as string });
+      setImageBg({ url: me.me.backgroundPicture as string });
     }
   }, [me?.me]);
 
@@ -50,7 +98,7 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
     });
 
   // TODO: Set the bg image in the preview when is loaded
-  // TODO: Update the query for merts and for user to update the images if needed
+  // TODO: Update the query for merts
   return (
     <div
       style={{

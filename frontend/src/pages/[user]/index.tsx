@@ -13,6 +13,7 @@ const UserPage = () => {
       mertId: null,
     },
   });
+
   // TODO: show a good old vector for no merts published
 
   return (
