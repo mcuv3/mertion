@@ -126,8 +126,9 @@ export class Auth {
         message: "Validation errors",
       };
     }
-    console.log(fields);
+
     const user = await User.findOne({ where: { email: fields.email } });
+
     if (!user)
       return {
         message: "No user found",

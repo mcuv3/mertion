@@ -12,7 +12,7 @@ interface SaveResult {
 
 export const saveFile = async (
   file: Upload,
-  user: UserCookie,
+  user: any,
   sendTo: (_: string) => string,
   folder: string
 ): Promise<SaveResult> => {

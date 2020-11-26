@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import MainPost from "../../components/Mert";
 import React from "react";
 import { NotFound } from "../../components/404";
+import { Spin } from "antd";
 
 const Post = () => {
   const router = useRouter();
@@ -22,7 +23,7 @@ const Post = () => {
     },
   });
 
-  if (!father?.mert) return <NotFound />;
+  if (!father?.mert) return <Spin style={{textAlign:"center",margin: "auto"}} />;
 
   return (
     <div style={{ width: "100%" }}>

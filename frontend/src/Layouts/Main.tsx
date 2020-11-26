@@ -93,7 +93,7 @@ const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
           flex: "1",
           margin: "auto",
           width: "720px",
-          height: "100%",
+          minHeight: "100vh",
           display: "flex",
         }}
       >

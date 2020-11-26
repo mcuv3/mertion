@@ -6,6 +6,7 @@ import { createConnection } from "typeorm";
 import express from "express";
 import connectRedis from "connect-redis";
 import session from "express-session";
+import http from "http";
 import {
   DATABASE_URL,
   REDIS_URL,
@@ -43,7 +44,7 @@ const main = async () => {
   const RedisStore = connectRedis(session);
   const redis = new Redis(REDIS_URL);
 
-  app.set("trust proxy", 1);
+  app.set("trust proxy", 2);
   app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
   app.use(
     cors({
@@ -73,10 +74,14 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     uploads: false,
-
+    subscriptions: {
+      path: "/subscriptions",
+      keepAlive: 12,
+    },
     schema: await buildSchema({
       authChecker: customAuthChecker,
       resolvers: [Auth, MertsResolver, UserResolver],
+
       validate: false,
     }),
     context: ({ req, res }: MyContext) => ({
@@ -98,13 +103,18 @@ const main = async () => {
     },
   });
 
+  const ws = http.createServer(app);
+  apolloServer.installSubscriptionHandlers(ws);
   apolloServer.applyMiddleware({
     app,
     cors: false,
   });
 
-  app.listen(PORT, () => {
+  ws.listen(PORT, () => {
     console.log(`Available at http://localhost:${PORT}/graphql`);
+    console.log(
+      `🚀 Subscriptions ready at ws://localhost:${PORT}${apolloServer.subscriptionsPath}`
+    );
   });
 };
 

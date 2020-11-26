@@ -48,21 +48,21 @@ export class SingUpInput extends Validator {
 
 @ObjectType()
 export class MeResponse extends StandardResponse {
-  @Field()
+  @Field({ nullable: true })
   email?: string;
-  @Field()
+  @Field({ nullable: true })
   id?: string;
-  @Field()
+  @Field({ nullable: true })
   username?: string;
-  @Field()
+  @Field({ nullable: true })
   picture?: string;
-  @Field()
+  @Field({ nullable: true })
   about?: string;
-  @Field()
+  @Field({ nullable: true })
   name?: string;
-  @Field()
+  @Field({ nullable: true })
   backgroundPicture?: string;
-  @Field()
+  @Field({ nullable: true })
   age?: number;
 }
 

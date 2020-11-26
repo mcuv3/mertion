@@ -196,6 +196,11 @@ export type ChangeProfileInput = {
   about?: Maybe<Scalars["String"]>;
 };
 
+export type Subscription = {
+  __typename?: "Subscription";
+  newMert: Mert;
+};
+
 export type BaseMertFragment = { __typename?: "Mert" } & Pick<
   Mert,
   "id" | "mert" | "likes" | "dislikes" | "picture" | "createdAt" | "comments"
@@ -413,6 +418,12 @@ export type UserReactionsQuery = { __typename?: "Query" } & {
     };
 };
 
+export type NewMertSubscriptionVariables = Exact<{ [key: string]: never }>;
+
+export type NewMertSubscription = { __typename?: "Subscription" } & {
+  newMert: { __typename?: "Mert" } & BaseMertFragment;
+};
+
 export const BaseMertFragmentDoc = gql`
   fragment BaseMert on Mert {
     id
@@ -485,9 +496,7 @@ export function useCreateMertMutation(
 export type CreateMertMutationHookResult = ReturnType<
   typeof useCreateMertMutation
 >;
-export type CreateMertMutationResult = Apollo.MutationResult<
-  CreateMertMutation
->;
+export type CreateMertMutationResult = Apollo.MutationResult<CreateMertMutation>;
 export type CreateMertMutationOptions = Apollo.BaseMutationOptions<
   CreateMertMutation,
   CreateMertMutationVariables
@@ -786,9 +795,7 @@ export function useUpdateProfileMutation(
 export type UpdateProfileMutationHookResult = ReturnType<
   typeof useUpdateProfileMutation
 >;
-export type UpdateProfileMutationResult = Apollo.MutationResult<
-  UpdateProfileMutation
->;
+export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
 export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<
   UpdateProfileMutation,
   UpdateProfileMutationVariables
@@ -1056,3 +1063,42 @@ export type UserReactionsQueryResult = Apollo.QueryResult<
   UserReactionsQuery,
   UserReactionsQueryVariables
 >;
+export const NewMertDocument = gql`
+  subscription newMert {
+    newMert {
+      ...BaseMert
+    }
+  }
+  ${BaseMertFragmentDoc}
+`;
+
+/**
+ * __useNewMertSubscription__
+ *
+ * To run a query within a React component, call `useNewMertSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useNewMertSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useNewMertSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useNewMertSubscription(
+  baseOptions?: Apollo.SubscriptionHookOptions<
+    NewMertSubscription,
+    NewMertSubscriptionVariables
+  >
+) {
+  return Apollo.useSubscription<
+    NewMertSubscription,
+    NewMertSubscriptionVariables
+  >(NewMertDocument, baseOptions);
+}
+export type NewMertSubscriptionHookResult = ReturnType<
+  typeof useNewMertSubscription
+>;
+export type NewMertSubscriptionResult = Apollo.SubscriptionResult<NewMertSubscription>;

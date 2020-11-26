@@ -2,11 +2,10 @@ import { Mert, useMertQuery, useMertsQuery } from "../../generated/graphql";
 import MainPost from "../../components/Mert";
 import { useRouter } from "next/router";
 import UserInfo from "../../components/UserInfo";
-import { relative } from "path";
 
 const UserPage = () => {
   const router = useRouter();
-  const { data: merts } = useMertsQuery({
+  const { data: merts, loading } = useMertsQuery({
     variables: {
       cursor:
         (typeof router.query.user === "string" && router.query.user) || null,
@@ -31,9 +30,13 @@ const UserPage = () => {
         <UserInfo />
       </div>
       <div style={{ width: "100%" }}>
-        {merts?.merts?.map((m) => {
-          return <MainPost mert={m as Mert} key={m.id} />;
-        })}
+        {merts?.merts?.length === 1 && !loading ? (
+          <img src="/assets/no_merts.svg" alt="" />
+        ) : (
+          merts?.merts?.map((m) => {
+            return <MainPost mert={m as Mert} key={m.id} />;
+          })
+        )}
       </div>
     </div>
   );

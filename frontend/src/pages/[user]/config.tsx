@@ -29,7 +29,7 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
       if (data?.changeProfile.success && me?.me) {
         const fragments = {
           fragment: gql`
-            fragment ___ on User {
+            fragment _user on User {
               about
               name
               picture
@@ -47,6 +47,7 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
             age: form.getFieldValue("age"),
           },
         };
+        console.log(me.me.id)
         cache.writeFragment({
           id: "User:" + me.me.id,
           ...fragments,
@@ -59,6 +60,7 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
             fragment _me on MeResponse {
               about
               name
+              age
               picture
               username
               backgroundPicture
@@ -73,7 +75,7 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
     response: data?.changeProfile,
   });
   useEffect(() => {
-    if (router.query.user !== me?.me?.username || (!me?.me && !meLoading)) {
+    if (router.query.user !== me?.me?.username && !meLoading) {
       router.push("/");
     } else if (me?.me) {
       form.setFields([
@@ -97,8 +99,6 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
       },
     });
 
-  // TODO: Set the bg image in the preview when is loaded
-  // TODO: Update the query for merts
   return (
     <div
       style={{
@@ -166,4 +166,4 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
   );
 };
 
-export default withApollo({ ssr: true })(withRouter(ConfigUser));
+export default withApollo({ ssr: false })(withRouter(ConfigUser));

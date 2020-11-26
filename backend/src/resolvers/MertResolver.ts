@@ -4,9 +4,12 @@ import {
   Ctx,
   FieldResolver,
   Mutation,
+  PubSub,
+  PubSubEngine,
   Query,
   Resolver,
   Root,
+  Subscription,
 } from "type-graphql";
 import { createWriteStream } from "fs";
 import { Mert, User } from "../entities";
@@ -20,13 +23,7 @@ import {
 import { MyContext } from "../types";
 import { toMethPath } from "../constants";
 import { extension } from "../utils/fileExtension";
-import {
-  FindConditions,
-  FindOneOptions,
-  getManager,
-  LessThan,
-  ObjectLiteral,
-} from "typeorm";
+import { getManager, LessThan, ObjectLiteral } from "typeorm";
 import validator from "validator";
 
 @Resolver(Mert)
@@ -40,7 +37,8 @@ export class MertsResolver {
   @Mutation(() => MertCreationResponse)
   async createMert(
     @Arg("fields") fields: MertInput,
-    @Ctx() { req, db }: MyContext
+    @Ctx() { req, db }: MyContext,
+    @PubSub() pubSub: PubSubEngine
   ): Promise<MertCreationResponse> {
     const errors = new MertInput(fields).validate();
     if (errors.length > 0)
@@ -87,6 +85,8 @@ export class MertsResolver {
       };
     }
     mert = await Mert.findOne(mert.id, { relations: ["user"] });
+
+    await pubSub.publish("MERTS", mert);
 
     if (!mert) {
       return {
@@ -192,5 +192,11 @@ export class MertsResolver {
       success: true,
       users: usersReaction,
     };
+  }
+
+  @Subscription(() => Mert, { topics: "MERTS", nullable: true })
+  newMert(@Root() mert: Mert): Mert | null {
+    console.log(mert);
+    return mert ? mert : null;
   }
 }

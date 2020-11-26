@@ -12,21 +12,21 @@
   "author": "mcuve (https://github.com/MauricioAntonioMartinez)",
   "license": "ISC",
   "dependencies": {
-    "@apollo/client": "^3.2.5",
+    "@apollo/client": "^3.2.9",
     "@zeit/next-less": "^1.0.1",
     "@zeit/next-sass": "^1.0.1",
     "antd": "^4.7.3",
     "apollo-upload-client": "^14.1.2",
     "graphql": "^15.4.0",
     "next": "^10.0.0",
+    "next-seo": "^4.17.0",
     "nextjs-progressbar": "0.0.6",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "sharp": "^0.26.2"
+    "sharp": "^0.26.2",
+    "subscriptions-transport-ws": "^0.9.18"
   },
   "devDependencies": {
-    "less": "^3.12.2",
-    "sass": "^1.27.0",
     "@graphql-codegen/cli": "^1.19.0",
     "@graphql-codegen/typescript": "^1.17.11",
     "@graphql-codegen/typescript-operations": "^1.17.8",
@@ -34,6 +34,10 @@
     "@types/apollo-upload-client": "^14.1.0",
     "@types/node": "^14.14.5",
     "@types/react": "^16.9.54",
+    "@types/ws": "^7.4.0",
+    "babel-plugin-inline-react-svg": "^1.1.2",
+    "less": "^3.12.2",
+    "sass": "^1.27.0",
     "typescript": "^4.0.5"
   }
 }

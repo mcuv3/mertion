@@ -12,4 +12,4 @@ export const toBackgroundsPath = (pic: string) =>
   path.join(__dirname, "public", "backgrounds", pic);
 
 export const SESSION_SECRET = process.env.SESSION_SECRET as string;
-export const PORT = +process.env.PORT!;
+export const PORT = +process.env.PORT! || 4000;
