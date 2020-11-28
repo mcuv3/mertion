@@ -1,10 +1,10 @@
 import { Mert, useMertQuery, useMertsQuery } from "../../generated/graphql";
 import MainPost from "../../components/Mert";
-import { useRouter } from "next/router";
+import { useRouter, withRouter } from "next/router";
 import UserInfo from "../../components/UserInfo";
+import { WithRouterProps } from "next/dist/client/with-router";
 
-const UserPage = () => {
-  const router = useRouter();
+const UserPage = ({ router }: WithRouterProps) => {
   const { data: merts, loading } = useMertsQuery({
     variables: {
       cursor:
@@ -30,7 +30,7 @@ const UserPage = () => {
         <UserInfo />
       </div>
       <div style={{ width: "100%" }}>
-        {merts?.merts?.length === 1 && !loading ? (
+        {merts?.merts?.length === 0 && !loading ? (
           <img src="/assets/no_merts.svg" alt="" />
         ) : (
           merts?.merts?.map((m) => {
@@ -42,4 +42,4 @@ const UserPage = () => {
   );
 };
 
-export default UserPage;
+export default withRouter(UserPage);

@@ -39,7 +39,7 @@ const Home = () => {
     if (
       newMert &&
       !loadNewMerts &&
-      newMert.newMert.user.username !== data?.me?.username
+      newMert?.newMert?.user?.username !== data?.me?.username
     ) {
       client.cache.writeQuery<MertsQuery>({
         query: MertsDocument,
@@ -50,7 +50,6 @@ const Home = () => {
       });
     }
   }, [newMert]);
-  console.log("SUBSCRIPTION:", newMert);
   return (
     <div style={{ width: "100%" }}>
       <BackTop style={style}>
