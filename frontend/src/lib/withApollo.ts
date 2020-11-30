@@ -73,11 +73,24 @@ const createClient = (ctx: NextPageContext) => {
           : undefined) || "",
     },
     cache: new InMemoryCache({
-      // typePolicies: {
-      //   // Query: {
-      //   //   fields: {},
-      //   // },
-      // },
+      typePolicies: {
+        Query: {
+          fields: {
+            merts: {
+              keyArgs: [],
+              merge(newer = [], older, ...args) {
+                console.log(newer, older);
+                console.log(args);
+                const isValidMerge = newer.find(
+                  (e: any) => e?.__ref === older[0]?.__ref
+                );
+                if (isValidMerge) return newer;
+                return [...newer, ...older];
+              },
+            },
+          },
+        },
+      },
     }),
   });
 };

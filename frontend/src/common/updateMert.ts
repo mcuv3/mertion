@@ -22,7 +22,7 @@ export const updateCreateMert = (fatherId?: string) => {
           query: MertsDocument,
           variables: { cursor: null, mertId: fatherId || null },
           data: {
-            merts: [{ ...mert } as Mert, ...(merts?.merts || [])],
+            merts: [{ ...mert } as Mert],
           },
         });
       } catch (e) {}

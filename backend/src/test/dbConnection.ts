@@ -1,8 +1,21 @@
 import { createConnection, getConnection } from "typeorm";
+import { DATABASE_URL } from "../constants";
+import { Mert, User } from "../entities";
 
 const connection = {
   async create() {
-    await createConnection();
+    await createConnection({
+      type: "postgres",
+      host: "localhost",
+      port: 5432,
+      username: "postgres",
+      password: "postgres",
+      database: "test",
+      dropSchema: true,
+      logging: false,
+      synchronize: true,
+      entities: ["src/database/entities/*.ts"],
+    });
   },
 
   async close() {

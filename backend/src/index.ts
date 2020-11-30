@@ -28,11 +28,13 @@ import { mertLoader } from "./DataLoader/MertLoader";
 import { MyContext } from "./types";
 import { UserResolver } from "./resolvers/UserResolver";
 
-const main = async () => {
+export const main = async (test = false) => {
   const db = await createConnection({
     type: "postgres",
     entities: [User, Mert],
-    url: DATABASE_URL,
+    url: test
+      ? "postgresql://postgres:postgres@localhost:5432/test"
+      : DATABASE_URL,
     logging: true,
     synchronize: true,
     migrations: [path.join(__dirname, "./migrations/*")],
@@ -109,6 +111,8 @@ const main = async () => {
     app,
     cors: false,
   });
+
+  if (test) return ws;
 
   ws.listen(PORT, () => {
     console.log(`Available at http://localhost:${PORT}/graphql`);

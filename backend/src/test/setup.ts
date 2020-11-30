@@ -11,7 +11,3 @@ afterAll(async () => {
 beforeEach(async () => {
   await connection.clear();
 });
-
-it("creates a user", () => {
-  // TODO
-});

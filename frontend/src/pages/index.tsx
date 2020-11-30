@@ -1,5 +1,5 @@
 import { withApollo } from "../lib/withApollo";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   MeResponse,
   Mert,
@@ -31,11 +31,37 @@ const Home = () => {
   const { data: newMert, loading: loadNewMerts } = useNewMertSubscription();
   const client = useApolloClient();
   const { data, loading } = useMeQuery();
-  const { data: merts } = useMertsQuery({
+  const { data: merts, fetchMore, loading: loadingMerts } = useMertsQuery({
     variables: { cursor: null, mertId: null },
+    notifyOnNetworkStatusChange: true,
   });
+  const [fetching, setFetching] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (merts?.merts) {
+      const listener = window.addEventListener("scroll", () => {
+        const downPosition =
+          window.scrollY + document.documentElement.clientHeight;
+        if (downPosition + 350 >= document.documentElement.scrollHeight) {
+          // TODO: fetch more
+          // document.body.style.height = `${document.body.clientHeight + 50}px`;
+          if (merts?.merts && !loadingMerts && merts.merts.length > 9) {
+            console.log(merts.merts[merts.merts.length - 1]?.mert);
+            fetchMore({
+              variables: {
+                cursor: new Date(
+                  +merts.merts[merts.merts.length - 1]?.createdAt
+                ).toString(),
+                mertId: null,
+              },
+            });
+          }
+        }
+      });
+    }
+  }, [merts]);
+
+  useEffect(() => {
     if (
       newMert &&
       !loadNewMerts &&

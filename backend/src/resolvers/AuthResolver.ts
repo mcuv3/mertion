@@ -23,6 +23,11 @@ import { extension } from "../utils/fileExtension";
 
 @Resolver()
 export class Auth {
+  @Query(() => String)
+  hello() {
+    return "World";
+  }
+
   @Query(() => MeResponse, { nullable: true })
   async me(@Ctx() { req }: MyContext) {
     if (!req.session.userId) return null;
