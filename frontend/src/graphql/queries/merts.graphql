@@ -1,5 +1,8 @@
 query Merts($mertId: String, $cursor: String) {
   merts(mertId: $mertId, cursor: $cursor) {
-    ...BaseMert
+    merts {
+      ...BaseMert
+    }
+    hasMore
   }
 }

@@ -21,7 +21,6 @@ const UserInfo = ({ router }: WithRouterProps) => {
   });
 
   const { data: me } = useMeQuery();
-  console.log(user);
 
   if (!user && !loading) router.push("/404");
 

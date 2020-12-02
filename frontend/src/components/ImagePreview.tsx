@@ -15,8 +15,13 @@ interface Props {
 }
 
 export const ImagePreview: React.FC<Props> = ({ setImage, image }) => {
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (info: UploadChangeParam<UploadFile<any>>) => {
+    if (info.file.status === "uploading") setLoading(true);
     if (info.file.status === "done") {
+      console.log("DONE");
+      setLoading(false);
       getBase64(info.file.originFileObj, (imageUrl: any) => {
         setImage({
           file: info.file.originFileObj,
@@ -37,7 +42,11 @@ export const ImagePreview: React.FC<Props> = ({ setImage, image }) => {
       onChange={handleChange}
     >
       {image?.url ? (
-        <img src={image?.url} alt="avatar" style={{ height: "100%" }} />
+        loading ? (
+          <h1>Loading</h1>
+        ) : (
+          <img src={image?.url} alt="avatar" style={{ height: "100%" }} />
+        )
       ) : (
         <PictureOutlined style={{ fontSize: "1.5rem" }} />
       )}

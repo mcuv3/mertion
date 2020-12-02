@@ -12,6 +12,7 @@ import { getMainDefinition } from "@apollo/client/utilities";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { createUploadLink } from "apollo-upload-client";
 import { SubscriptionClient } from "subscriptions-transport-ws";
+import { MertsResponse } from "../generated/graphql";
 
 const URI =
   typeof window === "undefined"
@@ -49,7 +50,6 @@ const buildLink = (ctx: NextPageContext) => {
   const link = split(
     ({ query }) => {
       const def = getMainDefinition(query);
-      console.log(def);
       return (
         def.kind === "OperationDefinition" && def.operation === "subscription"
       );
@@ -78,14 +78,27 @@ const createClient = (ctx: NextPageContext) => {
           fields: {
             merts: {
               keyArgs: [],
-              merge(newer = [], older, ...args) {
-                console.log(newer, older);
-                console.log(args);
-                const isValidMerge = newer.find(
-                  (e: any) => e?.__ref === older[0]?.__ref
+              merge(
+                newer: MertsResponse = { merts: [], hasMore: true },
+                older: MertsResponse
+              ): MertsResponse {
+                console.log(older);
+                if (older.merts.length === 1) {
+                  return {
+                    hasMore: older.hasMore,
+                    merts: [...older.merts, ...newer.merts],
+                  };
+                }
+
+                const isValidMerge = newer.merts.find(
+                  (e: any) => e?.__ref === (older.merts[0] as any)?.__ref
                 );
                 if (isValidMerge) return newer;
-                return [...newer, ...older];
+
+                return {
+                  hasMore: older.hasMore,
+                  merts: [...newer.merts, ...older.merts],
+                };
               },
             },
           },

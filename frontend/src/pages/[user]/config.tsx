@@ -47,7 +47,6 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
             age: form.getFieldValue("age"),
           },
         };
-        console.log(me.me.id)
         cache.writeFragment({
           id: "User:" + me.me.id,
           ...fragments,

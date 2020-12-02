@@ -16,6 +16,7 @@ import { Mert, User } from "../entities";
 import {
   MertCreationResponse,
   MertInput,
+  MertsResponse,
   Reactions,
   ReactionsMertResponse,
   UserReactionsResponse,
@@ -25,6 +26,7 @@ import { toMethPath } from "../constants";
 import { extension } from "../utils/fileExtension";
 import { getManager, LessThan, ObjectLiteral } from "typeorm";
 import validator from "validator";
+import { validateImage } from "../utils/validateImage";
 
 @Resolver(Mert)
 export class MertsResolver {
@@ -37,7 +39,7 @@ export class MertsResolver {
   @Mutation(() => MertCreationResponse)
   async createMert(
     @Arg("fields") fields: MertInput,
-    @Ctx() { req, db }: MyContext,
+    @Ctx() { req, redis }: MyContext,
     @PubSub() pubSub: PubSubEngine
   ): Promise<MertCreationResponse> {
     const errors = new MertInput(fields).validate();
@@ -47,7 +49,7 @@ export class MertsResolver {
         message: "Validation error",
         success: false,
       };
-    let mert: Mert | undefined;
+    let mert: Mert;
     try {
       mert = await getManager().transaction(async (_) => {
         mert = await _.create(Mert, {
@@ -61,20 +63,24 @@ export class MertsResolver {
 
         if (fields.picture) {
           const picture = await fields.picture;
+          const isValidPicture = validateImage(fields.picture);
+          if (!isValidPicture) throw new Error("Invalid file");
           const imageName = mert.id + extension(picture.filename);
-          mert.picture = `${process.env.HOST_SERVER}/merts/${imageName}`;
-          mert.save();
 
-          const success = await new Promise<boolean>((resolve, reject) =>
+          await new Promise((resolve, reject) =>
             picture
               .createReadStream()
               .pipe(createWriteStream(toMethPath(imageName)))
-              .on("finish", () => resolve(true))
+              .on("finish", () => {
+                mert.picture = `${process.env.HOST_SERVER}/merts/${imageName}`;
+                resolve(true);
+              })
               .on("error", (e) => {
                 reject(false);
+                throw new Error("Cannot upload the image");
               })
           );
-          if (!success) throw new Error("Cannot upload the image");
+          await mert.save();
         }
         return mert;
       });
@@ -84,9 +90,19 @@ export class MertsResolver {
         message: e.message,
       };
     }
-    mert = await Mert.findOne(mert.id, { relations: ["user"] });
+    if (!mert)
+      return {
+        success: false,
+        message: "",
+      };
 
-    await pubSub.publish("MERTS", mert);
+    const mertCreated = await Mert.findOne(mert.id, { relations: ["user"] });
+    if (mertCreated?.father) {
+      await redis.lpush(mertCreated.father.id, JSON.stringify(mertCreated));
+    } else {
+      await redis.lpush("merts", JSON.stringify(mertCreated));
+      await pubSub.publish("MERTS", mertCreated);
+    }
 
     if (!mert) {
       return {
@@ -95,7 +111,7 @@ export class MertsResolver {
       };
     }
 
-    return { mert, success: true };
+    return { mert: mertCreated, success: true };
   }
 
   @Query(() => Mert, { nullable: true })
@@ -104,25 +120,38 @@ export class MertsResolver {
     return Mert.findOne(mertId, { relations: ["user"] });
   }
 
-  @Query(() => [Mert], { nullable: true })
-  merts(
+  @Query(() => MertsResponse, { nullable: true })
+  async merts(
     @Arg("mertId", { nullable: true }) mertId: string,
-    @Arg("cursor", { nullable: true }) date: string
-  ): Promise<Mert[]> {
+    @Arg("cursor", { nullable: true }) dateOrUsername: string,
+    @Ctx() { redis }: MyContext
+  ): Promise<MertsResponse> {
     let conditions;
-    if (date && !validator.toDate(date))
+    // const cachedMerts = await redis.lrange("merts", 0, -1);
+    // const merts: Mert[] = cachedMerts.map((m) => JSON.parse(m));
+    const isValidDate = new Date(dateOrUsername).toString() === "Invalid Date";
+
+    if (dateOrUsername && !isValidDate) {
+      redis.lrange(dateOrUsername, 0, -1);
       conditions = (qy: any) => {
-        qy.where(`\"Mert__user\".\"username\"=:username`, { username: date });
+        qy.where(`\"Mert__user\".\"username\"=:username`, {
+          username: dateOrUsername,
+        });
       };
-    else
+    } else {
+      // pulled from the cache ??
+
       conditions = {
         fatherId: mertId,
         createdAt: LessThan(
-          date ? new Date(date) : new Date(Date.now()).toISOString()
+          dateOrUsername
+            ? new Date(+dateOrUsername).toISOString()
+            : new Date(Date.now()).toISOString()
         ),
       };
+    }
 
-    return Mert.find({
+    const merts = await Mert.find({
       take: 10,
       where: conditions,
       relations: ["user"],
@@ -130,6 +159,12 @@ export class MertsResolver {
         createdAt: "DESC",
       },
     });
+
+    console.log(merts);
+    return {
+      merts,
+      hasMore: merts.length === 10,
+    };
   }
 
   @Authorized()
@@ -196,7 +231,6 @@ export class MertsResolver {
 
   @Subscription(() => Mert, { topics: "MERTS", nullable: true })
   newMert(@Root() mert: Mert): Mert | null {
-    console.log(mert);
     return mert ? mert : null;
   }
 }

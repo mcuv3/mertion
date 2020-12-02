@@ -65,3 +65,12 @@ export class ReactionsMertResponse {
   @Field(() => [String])
   dislikes?: string[];
 }
+
+@ObjectType()
+export class MertsResponse {
+  @Field(() => [Mert])
+  merts!: Mert[];
+
+  @Field()
+  hasMore!: boolean;
+}

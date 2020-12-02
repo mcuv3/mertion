@@ -9,23 +9,27 @@ import {
 export const updateCreateMert = (fatherId?: string) => {
   const foo: MutationUpdaterFn<CreateMertMutation> = (cache, { data }) => {
     if (data?.createMert.success) {
-      console.log(fatherId);
       try {
         const merts = cache.readQuery<MertsQuery>({
           query: MertsDocument,
           variables: { cursor: null, mertId: fatherId || null },
         });
+
         const mert = data.createMert.mert;
-        console.log("RENDER ADDING");
 
         cache.writeQuery<MertsQuery>({
           query: MertsDocument,
           variables: { cursor: null, mertId: fatherId || null },
           data: {
-            merts: [{ ...mert } as Mert],
+            merts: {
+              hasMore: Boolean(merts?.merts?.hasMore),
+              merts: [{ ...mert, fromCache: true } as any],
+            },
           },
         });
-      } catch (e) {}
+      } catch (e) {
+        console.log(e);
+      }
     }
   };
   return foo;

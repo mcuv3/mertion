@@ -1,4 +1,4 @@
-import { Comment, Avatar, Tooltip } from "antd";
+import { Comment, Avatar, Tooltip, message } from "antd";
 import {
   BaseMertFragment,
   MeResponse,
@@ -33,6 +33,9 @@ export const AddPost: React.FC<Props> = ({
   const [image, setImage] = useState<{ url: string; file?: Blob } | null>();
 
   const create = async (mert: string) => {
+    if (!image && mert == "") {
+      return message.error("Please enter a mert :)");
+    }
     const res = await createMert({
       variables: {
         mert,
@@ -43,6 +46,8 @@ export const AddPost: React.FC<Props> = ({
     if (res.data?.createMert.success) {
       setImage(null);
       setWithImage(false);
+    } else {
+      message.error(res?.data?.createMert.message);
     }
   };
 

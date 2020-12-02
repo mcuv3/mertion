@@ -20,6 +20,7 @@ import { GraphQLUpload } from "graphql-upload";
 import argon2 from "argon2";
 import { toProfilePath } from "../constants";
 import { extension } from "../utils/fileExtension";
+import { validateImage } from "../utils/validateImage";
 
 @Resolver()
 export class Auth {
@@ -90,31 +91,40 @@ export class Auth {
       };
     }
 
-    const ext = extension(picture?.filename || "");
-    const isGoodFile = ext === ".png" || ext === ".jpg" || ext === ".jpeg";
-
     const hashPassword = await argon2.hash(fields.password);
-    await User.create({
-      ...fields,
-      picture: `${process.env.HOST_SERVER}/profile-pictures/${
-        (isGoodFile && fields.username + ext) || "default.png"
-      }`,
-      password: hashPassword,
-    }).save();
 
-    if (picture && isGoodFile) {
-      console.log("FILE =>", toProfilePath(fields.username + ext));
-      await new Promise<boolean>((resolve, reject) =>
+    const user = await User.create({
+      ...fields,
+      password: hashPassword,
+    });
+
+    if (picture) {
+      const isValidImage = await validateImage(picture);
+      if (!isValidImage)
+        return {
+          message: "Cannot upload this file.",
+          success: false,
+        };
+      const ext = extension(picture.filename);
+      await new Promise((resolve, reject) =>
         picture
           .createReadStream()
           .pipe(createWriteStream(toProfilePath(fields.username + ext)))
-          .on("finish", () => resolve(true))
+          .on("finish", () => {
+            user.picture = `${process.env.HOST_SERVER}/profile-pictures/${
+              fields.username + ext
+            }`;
+            resolve(true);
+          })
           .on("error", (e) => {
             console.log(e);
             reject(false);
           })
       );
     }
+
+    await user.save();
+    console.info("USER CREATED");
 
     return { success: true };
   }

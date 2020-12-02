@@ -4,6 +4,10 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
 };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -17,10 +21,11 @@ export type Scalars = {
 
 export type Query = {
   __typename?: "Query";
+  hello: Scalars["String"];
   me?: Maybe<MeResponse>;
   user?: Maybe<User>;
   mert?: Maybe<Mert>;
-  merts?: Maybe<Array<Mert>>;
+  merts?: Maybe<MertsResponse>;
   usersReactions: UserReactionsResponse;
 };
 
@@ -47,14 +52,14 @@ export type MeResponse = {
   success: Scalars["Boolean"];
   message?: Maybe<Scalars["String"]>;
   errors?: Maybe<Array<ErrorFieldClass>>;
-  email: Scalars["String"];
-  id: Scalars["String"];
-  username: Scalars["String"];
-  picture: Scalars["String"];
-  about: Scalars["String"];
-  name: Scalars["String"];
-  backgroundPicture: Scalars["String"];
-  age: Scalars["Float"];
+  email?: Maybe<Scalars["String"]>;
+  id?: Maybe<Scalars["String"]>;
+  username?: Maybe<Scalars["String"]>;
+  picture?: Maybe<Scalars["String"]>;
+  about?: Maybe<Scalars["String"]>;
+  name?: Maybe<Scalars["String"]>;
+  backgroundPicture?: Maybe<Scalars["String"]>;
+  age?: Maybe<Scalars["Float"]>;
 };
 
 export type ErrorFieldClass = {
@@ -89,6 +94,12 @@ export type Mert = {
   user: User;
   father?: Maybe<Mert>;
   comments: Scalars["Float"];
+};
+
+export type MertsResponse = {
+  __typename?: "MertsResponse";
+  merts: Array<Mert>;
+  hasMore: Scalars["Boolean"];
 };
 
 export type UserReactionsResponse = {
@@ -198,7 +209,7 @@ export type ChangeProfileInput = {
 
 export type Subscription = {
   __typename?: "Subscription";
-  newMert: Mert;
+  newMert?: Maybe<Mert>;
 };
 
 export type BaseMertFragment = { __typename?: "Mert" } & Pick<
@@ -379,7 +390,11 @@ export type MertsQueryVariables = Exact<{
 }>;
 
 export type MertsQuery = { __typename?: "Query" } & {
-  merts?: Maybe<Array<{ __typename?: "Mert" } & BaseMertFragment>>;
+  merts?: Maybe<
+    { __typename?: "MertsResponse" } & Pick<MertsResponse, "hasMore"> & {
+        merts: Array<{ __typename?: "Mert" } & BaseMertFragment>;
+      }
+  >;
 };
 
 export type UserQueryVariables = Exact<{
@@ -421,7 +436,7 @@ export type UserReactionsQuery = { __typename?: "Query" } & {
 export type NewMertSubscriptionVariables = Exact<{ [key: string]: never }>;
 
 export type NewMertSubscription = { __typename?: "Subscription" } & {
-  newMert: { __typename?: "Mert" } & BaseMertFragment;
+  newMert?: Maybe<{ __typename?: "Mert" } & BaseMertFragment>;
 };
 
 export const BaseMertFragmentDoc = gql`
@@ -905,7 +920,10 @@ export type MertQueryResult = Apollo.QueryResult<MertQuery, MertQueryVariables>;
 export const MertsDocument = gql`
   query Merts($mertId: String, $cursor: String) {
     merts(mertId: $mertId, cursor: $cursor) {
-      ...BaseMert
+      merts {
+        ...BaseMert
+      }
+      hasMore
     }
   }
   ${BaseMertFragmentDoc}
@@ -1032,7 +1050,7 @@ export const UserReactionsDocument = gql`
  * });
  */
 export function useUserReactionsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
+  baseOptions: Apollo.QueryHookOptions<
     UserReactionsQuery,
     UserReactionsQueryVariables
   >

@@ -41,7 +41,9 @@ export class User extends BaseEntity {
   about!: string;
 
   @Field({ nullable: true })
-  @Column("varchar")
+  @Column("varchar", {
+    default: `${process.env.HOST_SERVER}/profile-pictures/default.png`,
+  })
   picture!: string;
 
   @Field({ nullable: true })

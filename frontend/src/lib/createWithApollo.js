@@ -2,6 +2,7 @@ import React from "react";
 import App from "next/app";
 import Head from "next/head";
 import { ApolloProvider } from "@apollo/client";
+import dynamic from "next/dynamic";
 
 // On the client, we store the Apollo Client in the following variable.
 // This prevents the client from reinitializing between page transitions.
@@ -137,8 +138,8 @@ export const createWithApollo = (ac) => {
             try {
               // Import `@apollo/react-ssr` dynamically.
               // We don't want to have this in our client bundle.
-              const { getDataFromTree } = await import(
-                "@apollo/client/react/ssr"
+              const { getDataFromTree } = await dynamic(() =>
+                import("@apollo/client/react/ssr")
               );
 
               // Since AppComponents and PageComponents have different context types

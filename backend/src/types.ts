@@ -1,13 +1,14 @@
 import { Request, Response, Express } from "express";
+import Redis from "ioredis";
 import { Connection } from "typeorm";
 import { Stream } from "stream";
 import { mertLoader } from "./DataLoader/MertLoader";
-import { User } from "./entities";
 
 export type MyContext = {
   req: Request & { session: Express.Session };
   res: Response;
   db: Connection;
+  redis: Redis.Redis;
   mertLoader: ReturnType<typeof mertLoader>;
 };
 
