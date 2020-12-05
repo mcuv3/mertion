@@ -4,7 +4,6 @@ import {
   Column,
   Entity,
   OneToMany,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Mert } from "./Mert";
@@ -37,7 +36,7 @@ export class User extends BaseEntity {
   password!: string;
 
   @Field()
-  @Column("text")
+  @Column("text", { default: "" })
   about!: string;
 
   @Field({ nullable: true })

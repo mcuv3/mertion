@@ -1,6 +1,5 @@
 import { Field, ObjectType } from "type-graphql";
-import { Success } from "../types/GeneralTypes";
-import { extension } from "../utils/fileExtension";
+import { Success } from "./Common";
 
 export interface ErrorField {
   field: string;

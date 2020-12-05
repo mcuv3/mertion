@@ -10,42 +10,39 @@ interface SaveResult {
   message?: string;
 }
 
-export const saveFile = async (
-  file: Upload,
-  user: any,
-  sendTo: (_: string) => string,
-  folder: string
-): Promise<SaveResult> => {
-  const ext = extension(file?.filename || "");
-  const isGoodFile = ext === ".png" || ext === ".jpg" || ext === ".jpeg";
-
+export const saveFile = async ({
+  file,
+  fileKind,
+  saveTo,
+  fileName,
+  oldName,
+}: {
+  oldName?: string;
+  file: Upload;
+  fileName: any;
+  saveTo: (_: string) => string;
+  fileKind: string;
+}): Promise<SaveResult> => {
   try {
-    if (isGoodFile) {
-      const path = sendTo(user.username + ".jpg");
+    const ext = extension(file.filename);
+    if (oldName) {
+      const path = saveTo(oldName);
       if (existsSync(path)) unlinkSync(path);
-
-      const success = await new Promise<boolean>((resolve, reject) =>
-        file
-          .createReadStream()
-          .pipe(createWriteStream(sendTo(user.username + ext)))
-          .on("finish", () => resolve(true))
-          .on("error", (e) => {
-            console.log(e);
-            reject(false);
-          })
-      );
-      if (!success) throw new Error("Cannot save the image.");
-
-      return {
-        success,
-        url: `${process.env.HOST_SERVER}/${folder}/${user.username}${ext}`,
-      };
-    } else {
-      return {
-        success: false,
-        message: "Invalid file",
-      };
     }
+
+    await new Promise(() =>
+      file
+        .createReadStream()
+        .pipe(createWriteStream(saveTo(fileName + ext)))
+        .on("error", (e) => {
+          throw new Error("Cannot save the image");
+        })
+    );
+
+    return {
+      success: true,
+      url: `${process.env.HOST_SERVER}/${fileKind}/${fileName}${ext}`,
+    };
   } catch (e) {
     console.log(e);
     return {

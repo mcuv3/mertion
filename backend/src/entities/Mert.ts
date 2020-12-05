@@ -21,7 +21,7 @@ export class Mert extends BaseEntity {
   @Column("varchar", { length: "155" })
   mert!: string;
 
-  @Field()
+  @Field(() => String)
   @CreateDateColumn()
   createdAt!: string;
 
@@ -31,11 +31,11 @@ export class Mert extends BaseEntity {
 
   @Field(() => [String])
   @Column("simple-array")
-  likes?: Set<string>;
+  likes!: string[];
 
   @Field(() => [String])
   @Column("simple-array")
-  dislikes?: Set<string>;
+  dislikes!: string[];
 
   @Field()
   @Column("uuid", { nullable: true })
@@ -55,6 +55,7 @@ export class Mert extends BaseEntity {
 
   @Field(() => Number)
   async comments() {
+    // TODO: a better and performate implementation of this
     const [, n] = await Mert.findAndCount({ where: { fatherId: this.id } });
     return n;
   }

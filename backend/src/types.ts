@@ -23,4 +23,5 @@ export type UserCookie = {
   email: string;
   username: string;
   picture: string;
+  bgPicture: string;
 };

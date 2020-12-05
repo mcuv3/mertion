@@ -16,7 +16,7 @@ import { updateCreateMert } from "../common/updateMert";
 const { Text } = Typography;
 interface Props {
   fatherMert: Mert;
-  close: () => void;
+  close: (success: boolean) => void;
 }
 
 const Reply = ({ fatherMert, close }: Props) => {
@@ -35,7 +35,7 @@ const Reply = ({ fatherMert, close }: Props) => {
     });
     if (!res.data?.createMert.success) {
       message.error(res.data?.createMert.message);
-    } else close();
+    } else close(true);
   };
 
   return (
@@ -44,7 +44,7 @@ const Reply = ({ fatherMert, close }: Props) => {
       title={`Reply to ${fatherMert.user.username}`}
       visible
       onOk={create}
-      onCancel={close}
+      onCancel={close.bind(this, false)}
     >
       <div
         style={{
@@ -92,4 +92,4 @@ const Reply = ({ fatherMert, close }: Props) => {
   );
 };
 
-export default withApollo({ ssr: false })(Reply);
+export default Reply;

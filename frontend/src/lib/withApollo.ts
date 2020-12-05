@@ -77,24 +77,25 @@ const createClient = (ctx: NextPageContext) => {
         Query: {
           fields: {
             merts: {
-              keyArgs: [],
+              keyArgs: ["mertId", "cursor"],
               merge(
                 newer: MertsResponse = { merts: [], hasMore: true },
                 older: MertsResponse
               ): MertsResponse {
-                console.log(older);
                 if (older.merts.length === 1) {
                   return {
                     hasMore: older.hasMore,
                     merts: [...older.merts, ...newer.merts],
                   };
                 }
-
-                const isValidMerge = newer.merts.find(
-                  (e: any) => e?.__ref === (older.merts[0] as any)?.__ref
-                );
-                if (isValidMerge) return newer;
-
+                if (older.merts.length > 0) {
+                  const isValidMerge = newer.merts.find(
+                    (e: any) => e?.__ref === (older.merts[0] as any)?.__ref
+                  );
+                  if (isValidMerge) return newer;
+                }
+                console.log("OLDER", older);
+                console.log("NEWER", newer);
                 return {
                   hasMore: older.hasMore,
                   merts: [...newer.merts, ...older.merts],

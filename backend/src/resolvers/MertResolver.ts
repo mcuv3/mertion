@@ -15,18 +15,21 @@ import { createWriteStream } from "fs";
 import { Mert, User } from "../entities";
 import {
   MertCreationResponse,
-  MertInput,
   MertsResponse,
-  Reactions,
   ReactionsMertResponse,
   UserReactionsResponse,
-} from "../types/MertTypes";
+} from "../types/Responses";
+
 import { MyContext } from "../types";
 import { toMethPath } from "../constants";
 import { extension } from "../utils/fileExtension";
 import { getManager, LessThan, ObjectLiteral } from "typeorm";
 import validator from "validator";
 import { validateImage } from "../utils/validateImage";
+import { CreateMertInput } from "../types/Inputs";
+import { Reactions } from "../types/Common";
+import { saveFile } from "../utils/saveFile";
+import { toggleLikes } from "./MertHerlpers/toggleLikes";
 
 @Resolver(Mert)
 export class MertsResolver {
@@ -38,11 +41,11 @@ export class MertsResolver {
   @Authorized()
   @Mutation(() => MertCreationResponse)
   async createMert(
-    @Arg("fields") fields: MertInput,
+    @Arg("fields") fields: CreateMertInput,
     @Ctx() { req, redis }: MyContext,
     @PubSub() pubSub: PubSubEngine
   ): Promise<MertCreationResponse> {
-    const errors = new MertInput(fields).validate();
+    const errors = new CreateMertInput(fields).validate();
     if (errors.length > 0)
       return {
         errors,
@@ -62,24 +65,17 @@ export class MertsResolver {
         }).save();
 
         if (fields.picture) {
-          const picture = await fields.picture;
           const isValidPicture = validateImage(fields.picture);
           if (!isValidPicture) throw new Error("Invalid file");
-          const imageName = mert.id + extension(picture.filename);
+          const { url, success, message } = await saveFile({
+            file: fields.picture,
+            fileKind: "merts",
+            fileName: mert.id,
+            saveTo: toMethPath,
+          });
+          if (!success) throw new Error(message);
 
-          await new Promise((resolve, reject) =>
-            picture
-              .createReadStream()
-              .pipe(createWriteStream(toMethPath(imageName)))
-              .on("finish", () => {
-                mert.picture = `${process.env.HOST_SERVER}/merts/${imageName}`;
-                resolve(true);
-              })
-              .on("error", (e) => {
-                reject(false);
-                throw new Error("Cannot upload the image");
-              })
-          );
+          mert.picture = url;
           await mert.save();
         }
         return mert;
@@ -93,7 +89,7 @@ export class MertsResolver {
     if (!mert)
       return {
         success: false,
-        message: "",
+        message: "Mert not found",
       };
 
     const mertCreated = await Mert.findOne(mert.id, { relations: ["user"] });
@@ -127,6 +123,7 @@ export class MertsResolver {
     @Ctx() { redis }: MyContext
   ): Promise<MertsResponse> {
     let conditions;
+    //TODO: implement caching for merts
     // const cachedMerts = await redis.lrange("merts", 0, -1);
     // const merts: Mert[] = cachedMerts.map((m) => JSON.parse(m));
     const isValidDate = new Date(dateOrUsername).toString() === "Invalid Date";
@@ -160,7 +157,6 @@ export class MertsResolver {
       },
     });
 
-    console.log(merts);
     return {
       merts,
       hasMore: merts.length === 10,
@@ -175,21 +171,13 @@ export class MertsResolver {
     @Ctx() { db, req }: MyContext
   ): Promise<ReactionsMertResponse | null> {
     const mert = await Mert.findOne(mertId);
-
     if (!mert) return null;
-
-    let likesSet = new Set(mert.likes);
-    let dislikesSet = new Set(mert.dislikes);
-
-    if (reaction === Reactions.Like) {
-      dislikesSet.delete(req.session.userId);
-      likesSet.add(req.session.userId);
-    } else {
-      dislikesSet.add(req.session.userId);
-      likesSet.delete(req.session.userId);
-    }
-    const likes = Array.from(likesSet);
-    const dislikes = Array.from(dislikesSet);
+    const [likes, dislikes] = toggleLikes({
+      dislikes: mert.dislikes,
+      likes: mert.likes,
+      reaction: reaction,
+      userId: req.session.userId,
+    });
 
     await Mert.update(mert.id, {
       likes,
@@ -219,7 +207,7 @@ export class MertsResolver {
       users = mert.dislikes;
     }
 
-    if (!users) return { success: false };
+    if (!users) return { success: false, message: "Users not found" };
 
     const usersReaction = await User.findByIds(Array.from(users));
 
@@ -230,7 +218,10 @@ export class MertsResolver {
   }
 
   @Subscription(() => Mert, { topics: "MERTS", nullable: true })
-  newMert(@Root() mert: Mert): Mert | null {
-    return mert ? mert : null;
+  newMert(@Root() mert: Mert, @Ctx() { req }: MyContext): Mert | null {
+    if (!mert || mert.user?.id === req.session.id) {
+      return null;
+    }
+    return mert;
   }
 }

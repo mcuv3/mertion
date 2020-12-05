@@ -8,12 +8,7 @@ import {
   Resolver,
 } from "type-graphql";
 import { User } from "../entities/User";
-import {
-  MeResponse,
-  SignUpResponse,
-  SingInInput,
-  SingUpInput,
-} from "../types/AuthTypes";
+import { MeResponse, SignUpResponse } from "../types/Responses";
 import { MyContext, Upload } from "../types";
 import { createWriteStream } from "fs";
 import { GraphQLUpload } from "graphql-upload";
@@ -21,6 +16,8 @@ import argon2 from "argon2";
 import { toProfilePath } from "../constants";
 import { extension } from "../utils/fileExtension";
 import { validateImage } from "../utils/validateImage";
+import { SingInInput, SingUpInput } from "../types/Inputs";
+import { saveFile } from "../utils/saveFile";
 
 @Resolver()
 export class Auth {
@@ -30,20 +27,12 @@ export class Auth {
   }
 
   @Query(() => MeResponse, { nullable: true })
-  async me(@Ctx() { req }: MyContext) {
+  async me(@Ctx() { req }: MyContext): Promise<MeResponse | null> {
     if (!req.session.userId) return null;
     const user = await User.findOne(req.session.userId);
     if (!user) return null;
-    return {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      picture: user.picture,
-      name: user.name,
-      about: user.about,
-      age: user.age,
-      backgroundPicture: user.backgroundPicture,
-    };
+    Reflect.deleteProperty(user, "password");
+    return user;
   }
 
   @Query(() => User, { nullable: true })
@@ -102,29 +91,26 @@ export class Auth {
       const isValidImage = await validateImage(picture);
       if (!isValidImage)
         return {
-          message: "Cannot upload this file.",
+          message: "Cannot upload your profile photo.",
           success: false,
         };
-      const ext = extension(picture.filename);
-      await new Promise((resolve, reject) =>
-        picture
-          .createReadStream()
-          .pipe(createWriteStream(toProfilePath(fields.username + ext)))
-          .on("finish", () => {
-            user.picture = `${process.env.HOST_SERVER}/profile-pictures/${
-              fields.username + ext
-            }`;
-            resolve(true);
-          })
-          .on("error", (e) => {
-            console.log(e);
-            reject(false);
-          })
-      );
+
+      const { success, message, url } = await saveFile({
+        file: picture,
+        fileKind: "profile-pictures",
+        fileName: fields.username,
+        saveTo: toProfilePath,
+      });
+      if (!success) {
+        return {
+          message,
+          success: false,
+        };
+      }
+      user.picture = url as string;
     }
 
     await user.save();
-    console.info("USER CREATED");
 
     return { success: true };
   }
@@ -160,6 +146,7 @@ export class Auth {
     req.session.userId = user.id;
     req.session.username = user.username;
     req.session.picture = user.picture;
+    req.session.bgPicture = user.backgroundPicture;
 
     return {
       id: user.id,

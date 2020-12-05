@@ -1,5 +1,5 @@
 import v from "validator";
-import { ErrorField } from "../error/StandardResponse";
+import { ErrorField } from "../types/Error";
 export enum ValidationFields {
   required = "required",
   positive = "positive",

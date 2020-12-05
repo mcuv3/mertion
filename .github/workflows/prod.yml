@@ -11,5 +11,4 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - run: cd backend && npm i
-      - run: cd frontend && npm i
+      - run: echo "test"
