@@ -20,7 +20,7 @@ interface Props {
   fatherId?: string;
 }
 
-export const AddPost: React.FC<Props> = ({
+export const CreateMert: React.FC<Props> = ({
   me: { username, picture },
   fatherId,
 }) => {

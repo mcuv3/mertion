@@ -5,42 +5,57 @@ import {
   useMertsLazyQuery,
   useMertsQuery,
 } from "../../generated/graphql";
-import { useRouter } from "next/router";
+import { NextRouter, useRouter } from "next/router";
 import MainPost from "../../components/Mert";
 import React, { useEffect, useState } from "react";
 import { NotFound } from "../../components/404";
 import { Spin } from "antd";
 
+const getMertId = (router: NextRouter) =>
+  typeof router.query?.mert === "string" ? router.query!.mert : null;
+
 const UserMert = () => {
   const router = useRouter();
-  const [fathers, setFathers] = useState<Mert[]>([]);
+  const [fathers, setFathers] = useState<Set<string | undefined>>(new Set());
   const { data: father } = useMertQuery({
     variables: {
-      mertId:
-        typeof router.query?.mert === "string" ? router.query!.mert : null,
+      mertId: getMertId(router),
+    },
+  });
+
+  const { data: fathersMerts } = useMertsQuery({
+    variables: {
+      mertId: getMertId(router),
+      cursor: null,
     },
   });
 
   const [fetch, { data: nestedMerts }] = useMertsLazyQuery();
 
   useEffect(() => {
-    if (father?.mert) setFathers([father?.mert as Mert]);
+    if (father?.mert) setFathers((f) => f.add(father?.mert?.id));
     fetch({
       variables: {
         cursor: null,
-        mertId:
-          typeof router.query?.mert === "string" ? router.query!.mert : null,
+        mertId: getMertId(router),
       },
     });
   }, [father]);
 
-  const addFatherHandler = async (mert: Mert) => {
+  const addFatherHandler = (mert: Mert) => {
     setFathers((fathers) => {
-      const indexFather = fathers.findIndex((f) => f.id === mert.id);
-      if (indexFather === -1) return [...fathers, mert];
-      return fathers.slice(0, indexFather + 1);
+      const isInFathers = fathers.has(mert.id);
+      if (isInFathers) {
+        const arr = Array.from(fathers);
+        const index = arr.findIndex((e) => e === mert.id);
+        arr.slice(0, index + 1);
+        return new Set(arr);
+      }
+
+      const newFathers = fathers.add(mert.id);
+      return newFathers;
     });
-    await fetch({
+    fetch({
       variables: {
         cursor: null,
         mertId: mert.id,
@@ -54,16 +69,26 @@ const UserMert = () => {
   return (
     <div style={{ width: "100%" }}>
       <div>
-        {fathers.map((father) => {
-          return (
-            <MainPost
-              key={father.id}
-              mert={father}
-              isFather
-              fromUserMert
-              addFather={addFatherHandler}
-            />
-          );
+        <MainPost
+          key={father.mert.id}
+          mert={father.mert as Mert}
+          isFather
+          fromUserMert
+          addFather={addFatherHandler}
+        />
+        {fathersMerts?.merts?.merts.map((father) => {
+          if (fathers.has(father.id))
+            return (
+              <MainPost
+                key={father.id}
+                mert={father as Mert}
+                isFather
+                fromUserMert
+                addFather={addFatherHandler}
+              />
+            );
+
+          return null;
         })}
       </div>
       {/* //TODO: update accord the comments */}

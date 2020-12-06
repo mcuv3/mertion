@@ -10,7 +10,7 @@ import {
   useNewMertSubscription,
 } from "../generated/graphql";
 import MainPost from "../components/Mert";
-import { AddPost } from "../components/AddPost";
+import { CreateMert } from "../components/CreateMert";
 import { useIsAuth } from "../lib/useIsAuth";
 import { UpCircleOutlined } from "@ant-design/icons";
 import { InMemoryCache, useApolloClient } from "@apollo/client";
@@ -80,7 +80,7 @@ const Home = () => {
       <BackTop style={style}>
         <UpCircleOutlined />
       </BackTop>
-      {data?.me && !loading && <AddPost me={data?.me as MeResponse} />}
+      {data?.me && !loading && <CreateMert me={data?.me as MeResponse} />}
       {res?.merts?.merts?.map((m) => {
         return <MainPost mert={m as Mert} key={m.id} />;
       })}

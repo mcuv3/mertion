@@ -2,18 +2,11 @@ import Avatar from "antd/lib/avatar/avatar";
 import Modal from "antd/lib/modal/Modal";
 import { Typography, Comment, message } from "antd";
 import React, { useState } from "react";
-import {
-  MeResponse,
-  Mert,
-  useCreateMertMutation,
-  useMeQuery,
-} from "../generated/graphql";
-import { withApollo } from "../lib/withApollo";
-import { AddPost } from "./AddPost";
+import { Mert, useCreateMertMutation, useMeQuery } from "../generated/graphql";
 import { Editor } from "./Editor";
-import { useRouter } from "next/router";
 import { updateCreateMert } from "../common/updateMert";
 const { Text } = Typography;
+
 interface Props {
   fatherMert: Mert;
   close: (success: boolean) => void;
@@ -82,12 +75,6 @@ const Reply = ({ fatherMert, close }: Props) => {
           />
         }
       />
-      {/* <AddPost
-        success={close}
-        forceSubmit={submit}
-        me={me?.me as MeResponse}
-        fatherId={fatherMert.id}
-      /> */}
     </Modal>
   );
 };

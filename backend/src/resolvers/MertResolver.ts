@@ -126,10 +126,10 @@ export class MertsResolver {
     //TODO: implement caching for merts
     // const cachedMerts = await redis.lrange("merts", 0, -1);
     // const merts: Mert[] = cachedMerts.map((m) => JSON.parse(m));
-    const isValidDate = new Date(dateOrUsername).toString() === "Invalid Date";
+    // const isValidDate = new Date(dateOrUsername).toString() === "Invalid Date";
 
-    if (dateOrUsername && !isValidDate) {
-      redis.lrange(dateOrUsername, 0, -1);
+    if (dateOrUsername) {
+      // redis.lrange(dateOrUsername, 0, -1);
       conditions = (qy: any) => {
         qy.where(`\"Mert__user\".\"username\"=:username`, {
           username: dateOrUsername,

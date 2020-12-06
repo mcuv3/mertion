@@ -60,7 +60,6 @@ const MertComponent: React.FC<Props> = ({
   };
 
   const successReply = (success: boolean) => {
-    console.log(success);
     if (success) {
       client.cache.writeFragment({
         id: `Mert:${mert.id}`,
