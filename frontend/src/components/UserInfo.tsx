@@ -11,7 +11,7 @@ import { WithRouterProps } from "next/dist/client/with-router";
 const { Meta } = Card;
 
 const URL =
-  process.env.NODE_ENV === "production"
+  process.env.VERCEL_ENV === "production"
     ? process.env.NEXT_PUBLIC_API_URL_PRODUCTION
     : process.env.NEXT_PUBLIC_API_URL;
 
