@@ -91,7 +91,6 @@ const UserMert = () => {
           return null;
         })}
       </div>
-      {/* //TODO: update accord the comments */}
       {nestedMerts?.merts?.merts.map((m) => {
         return (
           <MainPost

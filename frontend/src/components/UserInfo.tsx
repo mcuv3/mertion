@@ -8,9 +8,12 @@ import React from "react";
 import { useMeQuery, useUserQuery } from "../generated/graphql";
 import { withRouter } from "next/router";
 import { WithRouterProps } from "next/dist/client/with-router";
-import { route } from "next/dist/next-server/server/router";
 const { Meta } = Card;
-interface Props {}
+
+const URL =
+  process.env.NODE_ENV === "production"
+    ? process.env.NEXT_PUBLIC_API_URL_PRODUCTION
+    : process.env.NEXT_PUBLIC_API_URL;
 
 const UserInfo = ({ router }: WithRouterProps) => {
   const { data: user, loading } = useUserQuery({
@@ -31,10 +34,7 @@ const UserInfo = ({ router }: WithRouterProps) => {
       cover={
         <img
           alt="example"
-          src={
-            user?.user?.backgroundPicture ||
-            "http://localhost:4000/backgrounds/default.jpg"
-          }
+          src={user?.user?.backgroundPicture || `${URL}/default.jpg`}
         />
       }
       actions={

@@ -4,9 +4,7 @@ import {
   useMeQuery,
   useUpdateProfileMutation,
 } from "../generated/graphql";
-import { Button, Form, Input, Upload } from "antd";
-import { WithRouterProps } from "next/dist/client/with-router";
-import { useFormErrors } from "../hooks/useFormErrors";
+import { Upload } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { beforeUpload, getBase64 } from "../validation/validation";
 import { UploadChangeParam } from "antd/lib/upload";

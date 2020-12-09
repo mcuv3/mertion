@@ -1,7 +1,6 @@
-import { toProfilePath } from "../constants";
-import { Upload, UserCookie } from "../types";
+import { Upload } from "../types";
 import { extension } from "./fileExtension";
-import { Request } from "express";
+
 import { createWriteStream, unlinkSync, existsSync } from "fs";
 
 interface SaveResult {

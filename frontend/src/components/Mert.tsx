@@ -16,6 +16,8 @@ import { isAuth } from "../util/checkAuth";
 import { checkAction } from "../common/checkAction";
 import { gql, useApolloClient } from "@apollo/client";
 
+const __prod__ = process.env.NODE_ENV === "production";
+
 interface Props {
   mert: Mert;
   isFather?: boolean;
@@ -109,7 +111,11 @@ const MertComponent: React.FC<Props> = ({
                 }}
                 width="50px"
                 height="50px"
-                src={mert?.user?.picture?.replace("localhost", "app") || ""}
+                src={
+                  (__prod__
+                    ? mert?.user?.picture
+                    : mert?.user?.picture?.replace("localhost", "app")) || ""
+                }
                 alt={mert.user.username || ""}
               />
             }

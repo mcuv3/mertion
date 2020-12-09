@@ -90,7 +90,12 @@ module.exports = withPlugins(
   ],
   {
     images: {
-      domains: ["localhost", "http://app:4000", "app"],
+      domains: [
+        "localhost",
+        "http://app:4000",
+        "app",
+        "https://git.heroku.com/mcuve-mertion.git:4000",
+      ],
     },
   }
 );

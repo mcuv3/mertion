@@ -15,6 +15,7 @@ import {
   SESSION_SECRET,
   PORT,
   __prod__,
+  ORIGIN_PRODUCTION,
 } from "./constants";
 import path from "path";
 import { ApolloServer } from "apollo-server-express";
@@ -51,7 +52,9 @@ export const main = async (test = false) => {
   app.use(
     cors({
       credentials: true,
-      origin: ["http://web:3000", "http://localhost:3000"],
+      origin: __prod__
+        ? ORIGIN_PRODUCTION
+        : ["http://web:3000", "http://localhost:3000"],
     })
   );
   app.use(
@@ -66,7 +69,7 @@ export const main = async (test = false) => {
         httpOnly: true,
         sameSite: "lax", // csrf
         secure: __prod__, // cookie only works in https
-        domain: __prod__ ? ".mydomain.com" : undefined,
+        domain: __prod__ ? ORIGIN_PRODUCTION : undefined,
       },
       saveUninitialized: false,
       secret: SESSION_SECRET,
