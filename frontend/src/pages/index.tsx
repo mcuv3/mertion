@@ -1,5 +1,9 @@
-import { withApollo } from "../lib/withApollo";
-import React, { useEffect, useState } from "react";
+import { UpCircleOutlined } from "@ant-design/icons";
+import { useApolloClient } from "@apollo/client";
+import { BackTop } from "antd";
+import React, { useEffect } from "react";
+import { CreateMert } from "../components/CreateMert";
+import MainPost from "../components/Mert";
 import {
   MeResponse,
   Mert,
@@ -9,13 +13,9 @@ import {
   useMertsQuery,
   useNewMertSubscription,
 } from "../generated/graphql";
-import MainPost from "../components/Mert";
-import { CreateMert } from "../components/CreateMert";
-import { useIsAuth } from "../lib/useIsAuth";
-import { UpCircleOutlined } from "@ant-design/icons";
-import { InMemoryCache, useApolloClient } from "@apollo/client";
-import { BackTop } from "antd";
 import { useScroll } from "../hooks/useScroll";
+import { useIsAuth } from "../lib/useIsAuth";
+import { withApollo } from "../lib/withApollo";
 const style: React.CSSProperties = {
   height: 40,
   width: 40,

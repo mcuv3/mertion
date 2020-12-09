@@ -138,9 +138,8 @@ export const createWithApollo = (ac) => {
             try {
               // Import `@apollo/react-ssr` dynamically.
               // We don't want to have this in our client bundle.
-              const { getDataFromTree } = await dynamic(() =>
-                import("@apollo/client/react/ssr")
-              );
+              // const { getDataFromTree } = await import("@apollo/react-ssr");
+              const { getDataFromTree } = await import("@apollo/react-ssr");
 
               // Since AppComponents and PageComponents have different context types
               // we need to modify their props a little.

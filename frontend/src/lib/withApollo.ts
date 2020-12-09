@@ -1,11 +1,5 @@
 import { createWithApollo } from "./createWithApollo";
-import {
-  ApolloClient,
-  ApolloLink,
-  from,
-  InMemoryCache,
-  NormalizedCacheObject,
-} from "@apollo/client";
+import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { NextPageContext } from "next";
 import { split, HttpLink } from "@apollo/client";
 import { getMainDefinition } from "@apollo/client/utilities";
