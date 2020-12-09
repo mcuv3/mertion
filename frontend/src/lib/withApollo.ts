@@ -89,8 +89,8 @@ const createClient = (ctx: NextPageContext) => {
                   );
                   if (isValidMerge) return newer;
                 }
-                console.log("OLDER", older);
-                console.log("NEWER", newer);
+                // console.log("OLDER", older);
+                // console.log("NEWER", newer);
                 return {
                   hasMore: older.hasMore,
                   merts: [...newer.merts, ...older.merts],

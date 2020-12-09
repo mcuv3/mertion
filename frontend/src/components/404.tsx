@@ -2,7 +2,7 @@ import { Button, Result } from "antd";
 import Link from "next/link";
 import React from "react";
 
-export const NotFound = () => (
+const NotFound = () => (
   <Result
     style={{ margin: "auto" }}
     status="404"
@@ -15,3 +15,5 @@ export const NotFound = () => (
     }
   />
 );
+
+export default NotFound;

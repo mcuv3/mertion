@@ -8,7 +8,7 @@ import {
 import { NextRouter, useRouter } from "next/router";
 import MainPost from "../../components/Mert";
 import React, { useEffect, useState } from "react";
-import { NotFound } from "../../components/404";
+import NotFound from "../../components/404";
 import { Spin } from "antd";
 
 const getMertId = (router: NextRouter) =>
