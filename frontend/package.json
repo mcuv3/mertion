@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
+    "start": "next start -p 3001",
     "gen": "graphql-codegen --config codegen.yml"
   },
   "keywords": [],

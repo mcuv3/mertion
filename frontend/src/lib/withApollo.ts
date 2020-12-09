@@ -12,9 +12,13 @@ let URI =
   typeof window === "undefined"
     ? process.env.SERVER_URL
     : process.env.NEXT_PUBLIC_API_URL;
-let URI_SW = process.env.NEXT_PUBLIC_API_WS as string;
+let URI_SW =
+  typeof window === "undefined"
+    ? process.env.SERVER_URL_WS
+    : process.env.NEXT_PUBLIC_API_WS;
 
-if (process.env.VERCEL_ENV !== "development") {
+console.log(process.env.NEXT_PUBLIC_API_WS_PRODUCTION);
+if (process.env.NODE_ENV !== "development") {
   URI = process.env.NEXT_PUBLIC_API_URL_PRODUCTION;
   URI_SW = process.env.NEXT_PUBLIC_API_WS_PRODUCTION as string;
 }
@@ -28,7 +32,7 @@ const buildLink = (ctx: NextPageContext, headers: Record<string, string>) => {
 
   if (typeof window === "undefined") return uploadLInk;
 
-  const client = new SubscriptionClient(URI_SW, {
+  const client = new SubscriptionClient(URI_SW as string, {
     reconnect: true,
     connectionParams: {
       headers,

@@ -16,7 +16,7 @@ import { isAuth } from "../util/checkAuth";
 import { checkAction } from "../common/checkAction";
 import { gql, useApolloClient } from "@apollo/client";
 
-const __prod__ = process.env.VERCEL_ENV === "production";
+const __prod__ = process.env.NODE_ENV === "production";
 
 interface Props {
   mert: Mert;

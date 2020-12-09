@@ -143,6 +143,7 @@ export const createWithApollo = (ac) => {
 
               // Since AppComponents and PageComponents have different context types
               // we need to modify their props a little.
+              console.log(getDataFromTree);
               let props;
               if (inAppContext) {
                 props = { ...pageProps, apolloClient };
