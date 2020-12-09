@@ -14,7 +14,7 @@ let URI =
     : process.env.NEXT_PUBLIC_API_URL;
 let URI_SW = process.env.NEXT_PUBLIC_API_WS as string;
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.NODE_ENV !== "development") {
   URI = process.env.NEXT_PUBLIC_API_URL_PRODUCTION;
   URI_SW = process.env.NEXT_PUBLIC_API_WS_PRODUCTION as string;
 }
