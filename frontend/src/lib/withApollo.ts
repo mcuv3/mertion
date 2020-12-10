@@ -18,7 +18,7 @@ let URI_SW =
   __server__
     ? process.env.SERVER_URL_WS
     : process.env.NEXT_PUBLIC_API_WS;
-
+    
 if (process.env.NODE_ENV !== "development") {
   URI = process.env.NEXT_PUBLIC_API_URL_PRODUCTION;
   URI_SW = process.env.NEXT_PUBLIC_API_WS_PRODUCTION || "";
