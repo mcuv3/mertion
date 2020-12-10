@@ -14,3 +14,4 @@ export const toBackgroundsPath = (pic: string) =>
 export const SESSION_SECRET = process.env.SESSION_SECRET as string;
 export const PORT = +process.env.PORT! || 4000;
 export const ORIGIN_PRODUCTION = process.env.ORIGIN_PRODUCTION;
+export const DOMAIN = process.env.DOMAIN;

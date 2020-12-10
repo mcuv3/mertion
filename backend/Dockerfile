@@ -15,7 +15,7 @@ EXPOSE 4000
 
 # COPY .env.production .env
 
-# ENV NODE_ENV=production
+ENV NODE_ENV=production
 
 USER node
 

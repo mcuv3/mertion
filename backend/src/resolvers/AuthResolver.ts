@@ -89,6 +89,7 @@ export class Auth {
 
     if (picture) {
       const isValidImage = await validateImage(picture);
+
       if (!isValidImage)
         return {
           message: "Cannot upload your profile photo.",

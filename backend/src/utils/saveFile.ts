@@ -29,10 +29,11 @@ export const saveFile = async ({
       if (existsSync(path)) unlinkSync(path);
     }
 
-    await new Promise(() =>
+    await new Promise((resolve) =>
       file
         .createReadStream()
         .pipe(createWriteStream(saveTo(fileName + ext)))
+        .on("finish", () => resolve(true))
         .on("error", (e) => {
           throw new Error("Cannot save the image");
         })

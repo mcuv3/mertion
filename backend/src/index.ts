@@ -16,6 +16,7 @@ import {
   PORT,
   __prod__,
   ORIGIN_PRODUCTION,
+  DOMAIN,
 } from "./constants";
 import path from "path";
 import { ApolloServer } from "apollo-server-express";
@@ -47,14 +48,14 @@ export const main = async (test = false) => {
   const RedisStore = connectRedis(session);
   const redis = new Redis(REDIS_URL);
 
-  app.set("trust proxy", 2);
+  app.set("trust proxy", 1);
   app.use(graphqlUploadExpress({ maxFileSize: 1000000000, maxFiles: 10 }));
   app.use(
     cors({
       credentials: true,
       origin: __prod__
-        ? ORIGIN_PRODUCTION
-        : ["http://web:3000", "http://localhost:3000"],
+        ? "https://mcuve.com"
+        : ["http://web:3000", "http://localhost:3000", "https://mcuve.com"],
     })
   );
   app.use(
@@ -69,7 +70,7 @@ export const main = async (test = false) => {
         httpOnly: true,
         sameSite: "lax", // csrf
         secure: __prod__, // cookie only works in https
-        domain: __prod__ ? ORIGIN_PRODUCTION : undefined,
+        domain: __prod__ ? DOMAIN : undefined,
       },
       saveUninitialized: false,
       secret: SESSION_SECRET,
