@@ -8,19 +8,20 @@ import { createUploadLink } from "apollo-upload-client";
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import { MertsResponse } from "../generated/graphql";
 
+const __server__ = typeof window === "undefined"
+
 let URI =
-  typeof window === "undefined"
+__server__
     ? process.env.SERVER_URL
     : process.env.NEXT_PUBLIC_API_URL;
 let URI_SW =
-  typeof window === "undefined"
+  __server__
     ? process.env.SERVER_URL_WS
     : process.env.NEXT_PUBLIC_API_WS;
 
-console.log(process.env.NEXT_PUBLIC_API_WS_PRODUCTION);
 if (process.env.NODE_ENV !== "development") {
   URI = process.env.NEXT_PUBLIC_API_URL_PRODUCTION;
-  URI_SW = process.env.NEXT_PUBLIC_API_WS_PRODUCTION as string;
+  URI_SW = process.env.NEXT_PUBLIC_API_WS_PRODUCTION || "";
 }
 
 const buildLink = (ctx: NextPageContext, headers: Record<string, string>) => {
@@ -30,7 +31,7 @@ const buildLink = (ctx: NextPageContext, headers: Record<string, string>) => {
     credentials: "include",
   });
 
-  if (typeof window === "undefined") return uploadLInk;
+  if (__server__) return uploadLInk;
 
   const client = new SubscriptionClient(URI_SW as string, {
     reconnect: true,
@@ -58,7 +59,7 @@ const buildLink = (ctx: NextPageContext, headers: Record<string, string>) => {
 const createClient = (ctx: NextPageContext) => {
   const headers = {
     cookie:
-      (typeof window === "undefined" ? ctx?.req?.headers.cookie : undefined) ||
+      (__server__ ? ctx?.req?.headers.cookie : undefined) ||
       "",
   };
 
