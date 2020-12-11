@@ -54,8 +54,8 @@ export const main = async (test = false) => {
     cors({
       credentials: true,
       origin: __prod__
-        ? "https://mcuve.com"
-        : ["http://web:3000", "http://localhost:3000", "https://mcuve.com"],
+        ? "https://www.mcuve.com"
+        : ["http://web:3000", "http://localhost:3000", "https://www.mcuve.com"],
     })
   );
   app.use(
