@@ -65,7 +65,7 @@ export class MertsResolver {
         }).save();
 
         if (fields.picture) {
-          const isValidPicture = validateImage(fields.picture);
+          const isValidPicture = await validateImage(fields.picture);
           if (!isValidPicture) throw new Error("Invalid file");
           const { url, success, message } = await saveFile({
             file: fields.picture,

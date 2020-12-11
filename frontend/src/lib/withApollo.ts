@@ -34,6 +34,7 @@ const buildLink = (ctx: NextPageContext, headers: Record<string, string>) => {
     connectionParams: {
       headers,
     },
+    reconnectionAttempts: 5,
   });
 
   const wsLink = new WebSocketLink(client);

@@ -90,7 +90,7 @@ module.exports = withPlugins(
   ],
   {
     images: {
-      domains: ["localhost", "http://app:4000", "app", "https://api.mcuve.com"],
+      domains: ["localhost", "http://app:4000", "app", "api.mcuve.com"],
     },
   }
 );
