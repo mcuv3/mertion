@@ -1,6 +1,6 @@
 import { Button, Form, Input } from "antd";
 import { WithRouterProps } from "next/dist/client/with-router";
-import { withRouter } from "next/router";
+import { useRouter, withRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { updateUser } from "../../common/updateUser";
 import SelectUpload from "../../components/SelectUpload";
@@ -16,7 +16,8 @@ const layout = {
   wrapperCol: { span: 24 },
 };
 
-export const ConfigUser = ({ router }: WithRouterProps) => {
+export const ConfigUser = () => {
+  const router = useRouter();
   const { data: me, loading: meLoading } = useMeQuery();
   const [image, setImage] = useState<{ url: string; file?: Blob }>();
   const [imageBg, setImageBg] = useState<{ url: string; file?: Blob }>();
@@ -106,4 +107,4 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
   );
 };
 
-export default withApollo({ ssr: false })(withRouter(ConfigUser));
+export default withApollo({ ssr: false })(ConfigUser);

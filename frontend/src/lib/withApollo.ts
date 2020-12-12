@@ -1,4 +1,5 @@
-import { createWithApollo } from "./createWithApollo";
+// import { createWithApollo } from "./createWithApollo";
+import { withApollo as createWithApollo } from "next-apollo";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { NextPageContext } from "next";
 import { split } from "@apollo/client";
@@ -52,13 +53,13 @@ const buildLink = (ctx: NextPageContext, headers: Record<string, string>) => {
   return link;
 };
 
-const createClient = (ctx: NextPageContext) => {
+const createClient = (ctx?: NextPageContext) => {
   const headers = {
     cookie: (__server__ ? ctx?.req?.headers.cookie : undefined) || "",
   };
 
   return new ApolloClient({
-    link: buildLink(ctx, headers),
+    link: ctx ? buildLink(ctx, headers) : undefined,
     uri: URI,
     credentials: "include",
     headers,

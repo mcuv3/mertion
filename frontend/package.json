@@ -13,7 +13,7 @@
   "author": "mcuve (https://github.com/MauricioAntonioMartinez)",
   "license": "ISC",
   "dependencies": {
-    "@apollo/client": "^3.2.9",
+    "@apollo/client": "^3.3.6",
     "@apollo/react-ssr": "^4.0.0",
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-less": "^1.0.1",

@@ -1,12 +1,14 @@
+import { Typography } from "antd";
 import { WithRouterProps } from "next/dist/client/with-router";
-import { withRouter } from "next/router";
+import { useRouter, withRouter } from "next/router";
 import MainPost from "../../components/Mert";
 import { NoMerts } from "../../components/NoMerts";
 import UserInfo from "../../components/UserInfo";
 import { Mert, useMertsQuery } from "../../generated/graphql";
 import { withApollo } from "../../lib/withApollo";
 
-const UserPage = ({ router }: WithRouterProps) => {
+const UserPage = () => {
+  const router = useRouter();
   const { data: res, loading } = useMertsQuery({
     variables: {
       cursor:
@@ -34,4 +36,4 @@ const UserPage = ({ router }: WithRouterProps) => {
   );
 };
 
-export default withApollo({ ssr: true })(withRouter(UserPage));
+export default withApollo({ ssr: true })(UserPage);
