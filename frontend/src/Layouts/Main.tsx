@@ -106,4 +106,4 @@ const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   );
 };
 
-export default withApollo({ ssr: false })(Main);
+export default Main;
