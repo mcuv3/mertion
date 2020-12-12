@@ -3,6 +3,7 @@ import "../styles/antd.less";
 import NextNprogress from "nextjs-progressbar";
 import { DefaultSeo } from "next-seo";
 import seoConfig from "../../seo.config";
+import { withApollo } from "../lib/withApollo";
 function MyApp({ Component, pageProps }: any) {
   return (
     <Main>
@@ -15,4 +16,4 @@ function MyApp({ Component, pageProps }: any) {
   );
 }
 
-export default MyApp;
+export default withApollo()(MyApp);

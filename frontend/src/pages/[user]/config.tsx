@@ -16,7 +16,7 @@ const layout = {
   wrapperCol: { span: 24 },
 };
 
-export const ConfigUser = () => {
+const ConfigUser = () => {
   const router = useRouter();
   const { data: me, loading: meLoading } = useMeQuery();
   const [image, setImage] = useState<{ url: string; file?: Blob }>();
@@ -107,4 +107,4 @@ export const ConfigUser = () => {
   );
 };
 
-export default withApollo({ ssr: false })(ConfigUser);
+export default ConfigUser;
