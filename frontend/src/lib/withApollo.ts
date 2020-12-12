@@ -1,4 +1,3 @@
-// import { createWithApollo } from "./createWithApollo";
 import { withApollo as createWithApollo } from "next-apollo";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { NextPageContext } from "next";
@@ -21,7 +20,7 @@ if (process.env.NODE_ENV !== "development") {
   URI_SW = process.env.NEXT_PUBLIC_API_WS_PRODUCTION || "";
 }
 
-const buildLink = (ctx: NextPageContext, headers: Record<string, string>) => {
+const buildLink = (headers: Record<string, string>) => {
   const uploadLInk = createUploadLink({
     headers,
     uri: URI,
@@ -59,7 +58,7 @@ const createClient = (ctx?: NextPageContext) => {
   };
 
   return new ApolloClient({
-    link: ctx ? buildLink(ctx, headers) : undefined,
+    link: buildLink(headers),
     uri: URI,
     credentials: "include",
     headers,
