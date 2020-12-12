@@ -2,8 +2,11 @@ import { Button, Tooltip } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import React, { useEffect, useState } from "react";
 import { PictureOutlined, SmileOutlined } from "@ant-design/icons";
-import { changeConfirmLocale } from "antd/lib/modal/locale";
-import { ImagePreview } from "./ImagePreview";
+import { __server__ } from "../util/isServer";
+import {} from "next";
+import { IEmojiData, IEmojiPickerProps } from "emoji-picker-react";
+// import Picker, { SKIN_TONE_MEDIUM_DARK } from "emoji-picker-react";
+let Picker: any;
 
 interface Props {
   onSubmit?: (val: string) => void;
@@ -27,10 +30,33 @@ export const Editor = ({
   const [value, setValue] = useState("");
 
   const submit = () => onSubmit && onSubmit(value);
+  const [Emoji, setEmoji] = useState<any>();
+  const [showEmoji, setShowEmoji] = useState(false);
 
   useEffect(() => {
     if (success && !loading) setValue("");
   }, [success, loading]);
+
+  const addrEmojiHandler = (event: MouseEvent, data: IEmojiData) => {
+    setValue((text) => text + data.emoji);
+  };
+
+  useEffect(() => {
+    if (process.browser) {
+      (async () => {
+        const pic = await import("emoji-picker-react");
+        setEmoji(
+          <pic.default
+            disableSearchBar
+            onEmojiClick={addrEmojiHandler}
+            disableAutoFocus={true}
+            skinTone={pic.SKIN_TONE_MEDIUM_DARK}
+            groupNames={{ smileys_people: "PEOPLE" }}
+          />
+        );
+      })();
+    }
+  }, []);
 
   return (
     <div>
@@ -44,6 +70,7 @@ export const Editor = ({
           rows={3}
           placeholder="Share your gains"
         />
+        {showEmoji && Emoji}
       </>
       <div
         style={{
@@ -55,6 +82,7 @@ export const Editor = ({
         <div>
           <Tooltip key="comment-basic-like-1" title="icons">
             <SmileOutlined
+              onClick={() => setShowEmoji((sh) => !sh)}
               style={{ fontSize: "1.5rem", marginRight: "0.5rem" }}
             />
           </Tooltip>
