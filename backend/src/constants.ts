@@ -6,7 +6,7 @@ export const COOKIE_NAME = "mv3";
 export const __prod__ = process.env.NODE_ENV === "production";
 export const toProfilePath = (pic: string) =>
   path.join(__dirname, "public", "profile-pictures", pic);
-export const toMethPath = (pic: string) =>
+export const toMertPath = (pic: string) =>
   path.join(__dirname, "public", "merts", pic);
 export const toBackgroundsPath = (pic: string) =>
   path.join(__dirname, "public", "backgrounds", pic);

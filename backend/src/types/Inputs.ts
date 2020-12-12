@@ -73,9 +73,6 @@ export class CreateMertInput extends Validator {
   @Field()
   mert!: string;
 
-  @Field(() => GraphQLUpload, { nullable: true })
-  picture?: Upload;
-
   @Field({ nullable: true })
   fatherId?: string;
 

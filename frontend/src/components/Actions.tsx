@@ -1,25 +1,14 @@
-import React, { createElement, useEffect, useState } from "react";
-import { Avatar, Card, Comment, Space, Tooltip } from "antd";
-import dayjs from "../util/dayjs";
-import Image from "next/image";
 import {
-  DislikeOutlined,
-  LikeOutlined,
   DislikeFilled,
+  DislikeOutlined,
   LikeFilled,
+  LikeOutlined,
   MessageOutlined,
 } from "@ant-design/icons";
-import {
-  MeQuery,
-  MeResponse,
-  Mert,
-  Reactions,
-  useMeQuery,
-  useReactMertMutation,
-} from "../generated/graphql";
+import { Tooltip } from "antd";
 import { useRouter } from "next/router";
-
-import Reply from "./Reply";
+import React from "react";
+import { Mert, Reactions, useMeQuery } from "../generated/graphql";
 import { isAuth } from "../util/checkAuth";
 
 interface Props {
@@ -38,7 +27,7 @@ const Actions = ({ action, likes, mert, dislikes, onClick, reply }: Props) => {
     <Tooltip key="comment-basic-like" title="Like">
       <span
         onClick={(e) => {
-          e.preventDefault();
+          e.stopPropagation();
           onClick(Reactions.Like);
         }}
       >
@@ -49,7 +38,7 @@ const Actions = ({ action, likes, mert, dislikes, onClick, reply }: Props) => {
     <Tooltip key="comment-basic-dislike" title="Dislike">
       <span
         onClick={(e) => {
-          e.preventDefault();
+          e.stopPropagation();
           onClick(Reactions.DisLike);
         }}
       >
@@ -60,9 +49,7 @@ const Actions = ({ action, likes, mert, dislikes, onClick, reply }: Props) => {
       </span>
     </Tooltip>,
     <Tooltip key="comment-basic-dislike" title="Comments">
-      <span
-      // onClick={(e) => isAuth(router, me) && reaction(e, Reactions.DisLike)}
-      >
+      <span>
         {React.createElement(MessageOutlined)}
         <span className="comment-action">{mert.comments}</span>
       </span>

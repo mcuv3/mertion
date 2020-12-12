@@ -1,5 +1,8 @@
 mutation CreateMert($mert: String!, $picture: Upload, $fatherId: String) {
-  createMert(fields: { mert: $mert, picture: $picture, fatherId: $fatherId }) {
+  createMert(
+    fields: { mert: $mert, fatherId: $fatherId }
+    mertPicture: $picture
+  ) {
     mert {
       ...BaseMert
     }

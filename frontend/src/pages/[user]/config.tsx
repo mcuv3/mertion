@@ -1,20 +1,16 @@
+import { Button, Form, Input } from "antd";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { withApollo } from "../../lib/withApollo";
+import { updateUser } from "../../common/updateUser";
+import SelectUpload from "../../components/SelectUpload";
 import {
-  MertsDocument,
-  MertsQuery,
   UpdateProfileMutationVariables,
   useMeQuery,
-  UserDocument,
-  UserQuery,
   useUpdateProfileMutation,
 } from "../../generated/graphql";
-import { Button, Form, Input } from "antd";
-import { withRouter } from "next/router";
-import { WithRouterProps } from "next/dist/client/with-router";
 import { useFormErrors } from "../../hooks/useFormErrors";
-import SelectUpload from "../../components/SelectUpload";
-import { gql } from "@apollo/client";
+import { withApollo } from "../../lib/withApollo";
 const layout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 24 },
@@ -26,67 +22,32 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
   const [imageBg, setImageBg] = useState<{ url: string; file?: Blob }>();
   const [updateProfile, { data }] = useUpdateProfileMutation({
     update: (cache, { data }) => {
-      if (data?.changeProfile.success && me?.me) {
-        const fragments = {
-          fragment: gql`
-            fragment _user on User {
-              about
-              name
-              picture
-              username
-              backgroundPicture
-            }
-          `,
-          data: {
-            about: form.getFieldValue("about"),
-            name: form.getFieldValue("name"),
-            picture: data.changeProfile.picture || me.me.picture,
-            username: form.getFieldValue("username"),
-            backgroundPicture:
-              data.changeProfile.backgroundImageUrl || me.me.backgroundPicture,
-            age: form.getFieldValue("age"),
-          },
-        };
-        cache.writeFragment({
-          id: "User:" + me.me.id,
-          ...fragments,
-        });
-
-        cache.writeFragment({
-          id: "MeResponse:" + me.me.id,
-          ...fragments,
-          fragment: gql`
-            fragment _me on MeResponse {
-              about
-              name
-              age
-              picture
-              username
-              backgroundPicture
-            }
-          `,
-        });
-      }
+      updateUser({ cache, data, form, me });
     },
   });
   const { form } = useFormErrors({
     success: () => {},
     response: data?.changeProfile,
   });
+
   useEffect(() => {
-    if (router.query.user !== me?.me?.username && !meLoading) {
-      router.push("/");
-    } else if (me?.me) {
-      form.setFields([
-        { name: "username", value: me?.me?.username },
-        { name: "name", value: me?.me?.name },
-        { name: "about", value: me?.me?.about },
-        { name: "age", value: me?.me?.age },
-      ]);
-      setImage({ url: me!.me!.picture as string });
-      setImageBg({ url: me.me.backgroundPicture as string });
+    if (!meLoading) {
+      const currentUser = router.query.user === me?.me?.username;
+      if (!currentUser) {
+        console.log(me?.me);
+        router.push("/");
+      } else if (me?.me) {
+        form.setFields([
+          { name: "username", value: me?.me?.username },
+          { name: "name", value: me?.me?.name },
+          { name: "about", value: me?.me?.about },
+          { name: "age", value: me?.me?.age },
+        ]);
+        setImage({ url: me!.me!.picture as string });
+        setImageBg({ url: me.me.backgroundPicture as string });
+      }
     }
-  }, [me?.me]);
+  }, [meLoading]);
 
   const onFinish = async (fields: UpdateProfileMutationVariables) =>
     updateProfile({
@@ -99,29 +60,9 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
     });
 
   return (
-    <div
-      style={{
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "space-around",
-          alignItems: "center",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            flexDirection: "column",
-          }}
-        >
+    <div className="configContainer">
+      <div className="formConfigContainer">
+        <div className="imagesConfig">
           <SelectUpload
             label="Profile Photo"
             image={image}
@@ -135,7 +76,7 @@ export const ConfigUser = ({ router }: WithRouterProps) => {
             key={2}
           />
         </div>
-        <Form {...layout} size="middle" form={form} style={{ width: "100%" }}>
+        <Form {...layout} size="middle" form={form} className="fullWidth">
           <Form.Item name="name" label="Name" rules={[{ required: true }]}>
             <Input />
           </Form.Item>

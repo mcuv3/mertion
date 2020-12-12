@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from "react";
-import {
-  UpdateProfileMutationVariables,
-  useMeQuery,
-  useUpdateProfileMutation,
-} from "../generated/graphql";
-import { Upload } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
-import { beforeUpload, getBase64 } from "../validation/validation";
+import { Upload } from "antd";
 import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
+import React, { useState } from "react";
+import { beforeUpload, getBase64 } from "../validation/validation";
 
 interface Props {
   image?: { url: string; file?: Blob };

@@ -54,7 +54,7 @@ const Login = () => {
     login({ variables: values });
 
   return (
-    <div style={{ width: "100%", margin: "auto" }}>
+    <div className="fullWidth auto">
       <Form
         {...layout}
         form={form}

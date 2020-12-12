@@ -1,14 +1,14 @@
-import { withApollo } from "../../lib/withApollo";
+import { withApollo } from "../../../lib/withApollo";
 import {
   Mert,
   useMertQuery,
   useMertsLazyQuery,
   useMertsQuery,
-} from "../../generated/graphql";
+} from "../../../generated/graphql";
 import { NextRouter, useRouter } from "next/router";
-import MainPost from "../../components/Mert";
+import MainPost from "../../../components/Mert";
 import React, { useEffect, useState } from "react";
-import NotFound from "../../components/404";
+import NotFound from "../../../components/404";
 import { Spin } from "antd";
 
 const getMertId = (router: NextRouter) =>

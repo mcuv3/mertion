@@ -1,9 +1,9 @@
+import { PictureOutlined } from "@ant-design/icons";
 import { Upload } from "antd";
 import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
-import React, { PropsWithChildren, useState } from "react";
+import React, { useState } from "react";
 import { beforeUpload, getBase64 } from "../validation/validation";
-import { PictureOutlined } from "@ant-design/icons";
 
 type imagePic = {
   url: string;

@@ -82,7 +82,6 @@ export const main = async (test = false) => {
     uploads: false,
     subscriptions: {
       path: "/subscriptions",
-      keepAlive: 12,
     },
     schema: await buildSchema({
       authChecker: customAuthChecker,

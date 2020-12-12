@@ -1,18 +1,9 @@
-import { Comment, Avatar, Tooltip, message } from "antd";
-import {
-  BaseMertFragment,
-  MeResponse,
-  Mert,
-  MertsDocument,
-  MertsQuery,
-  useCreateMertMutation,
-} from "../generated/graphql";
-const {} = Comment;
-import React, { useState } from "react";
-import { Editor } from "./Editor";
+import { Avatar, Comment, message } from "antd";
 import { useRouter } from "next/router";
-import { changeConfirmLocale } from "antd/lib/modal/locale";
+import React, { useState } from "react";
 import { updateCreateMert } from "../common/updateMert";
+import { MeResponse, useCreateMertMutation } from "../generated/graphql";
+import { Editor } from "./Editor";
 import { ImagePreview } from "./ImagePreview";
 
 interface Props {

@@ -31,10 +31,9 @@ const buildLink = (ctx: NextPageContext, headers: Record<string, string>) => {
 
   const client = new SubscriptionClient(URI_SW as string, {
     reconnect: true,
-    // connectionParams: {
-    //   headers,
-    // },
-    reconnectionAttempts: 5,
+    connectionParams: {
+      headers,
+    },
   });
 
   const wsLink = new WebSocketLink(client);

@@ -123,7 +123,7 @@ export type Mutation = {
   logout: Scalars["Boolean"];
   createMert: MertCreationResponse;
   reactMert?: Maybe<ReactionsMertResponse>;
-  changeProfile: UserUpdated;
+  changeProfile: UserUpdatedResponse;
 };
 
 export type MutationSignUpArgs = {
@@ -136,7 +136,8 @@ export type MutationLogInArgs = {
 };
 
 export type MutationCreateMertArgs = {
-  fields: MertInput;
+  mertPicture?: Maybe<Scalars["Upload"]>;
+  fields: CreateMertInput;
 };
 
 export type MutationReactMertArgs = {
@@ -179,9 +180,8 @@ export type MertCreationResponse = {
   mert?: Maybe<Mert>;
 };
 
-export type MertInput = {
+export type CreateMertInput = {
   mert: Scalars["String"];
-  picture?: Maybe<Scalars["Upload"]>;
   fatherId?: Maybe<Scalars["String"]>;
 };
 
@@ -191,8 +191,8 @@ export type ReactionsMertResponse = {
   dislikes: Array<Scalars["String"]>;
 };
 
-export type UserUpdated = {
-  __typename?: "UserUpdated";
+export type UserUpdatedResponse = {
+  __typename?: "UserUpdatedResponse";
   success: Scalars["Boolean"];
   message?: Maybe<Scalars["String"]>;
   errors?: Maybe<Array<ErrorFieldClass>>;
@@ -329,8 +329,8 @@ export type UpdateProfileMutationVariables = Exact<{
 }>;
 
 export type UpdateProfileMutation = { __typename?: "Mutation" } & {
-  changeProfile: { __typename?: "UserUpdated" } & Pick<
-    UserUpdated,
+  changeProfile: { __typename?: "UserUpdatedResponse" } & Pick<
+    UserUpdatedResponse,
     "success" | "message" | "picture" | "backgroundImageUrl"
   > & {
       errors?: Maybe<
@@ -458,7 +458,8 @@ export const BaseMertFragmentDoc = gql`
 export const CreateMertDocument = gql`
   mutation CreateMert($mert: String!, $picture: Upload, $fatherId: String) {
     createMert(
-      fields: { mert: $mert, picture: $picture, fatherId: $fatherId }
+      fields: { mert: $mert, fatherId: $fatherId }
+      mertPicture: $picture
     ) {
       mert {
         ...BaseMert

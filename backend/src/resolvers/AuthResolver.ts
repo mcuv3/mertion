@@ -1,23 +1,14 @@
-import {
-  Arg,
-  Ctx,
-  Field,
-  Mutation,
-  ObjectType,
-  Query,
-  Resolver,
-} from "type-graphql";
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
 import { MeResponse, SignUpResponse } from "../types/Responses";
 import { MyContext, Upload } from "../types";
-import { createWriteStream } from "fs";
 import { GraphQLUpload } from "graphql-upload";
 import argon2 from "argon2";
 import { toProfilePath } from "../constants";
-import { extension } from "../utils/fileExtension";
 import { validateImage } from "../utils/validateImage";
 import { SingInInput, SingUpInput } from "../types/Inputs";
 import { saveFile } from "../utils/saveFile";
+import { ProfilePictureStorage } from "../models/ImageStorage";
 
 @Resolver()
 export class Auth {
@@ -56,6 +47,7 @@ export class Auth {
 
   @Mutation(() => SignUpResponse)
   async signUp(
+    @Ctx() { db }: MyContext,
     @Arg("fields") fields: SingUpInput,
     @Arg("profile_picture", () => GraphQLUpload, { nullable: true })
     picture: Upload
@@ -68,52 +60,45 @@ export class Auth {
         success: false,
       };
     }
+    const qr = db.createQueryRunner();
+    try {
+      await qr.startTransaction();
 
-    const existingUser = await User.findOne({
-      where: [{ username: fields.username, email: fields.email }],
-    });
-
-    if (existingUser) {
-      return {
-        message: "You already have been registered",
-        success: false,
-      };
-    }
-
-    const hashPassword = await argon2.hash(fields.password);
-
-    const user = await User.create({
-      ...fields,
-      password: hashPassword,
-    });
-
-    if (picture) {
-      const isValidImage = await validateImage(picture);
-
-      if (!isValidImage)
-        return {
-          message: "Cannot upload your profile photo.",
-          success: false,
-        };
-
-      const { success, message, url } = await saveFile({
-        file: picture,
-        fileKind: "profile-pictures",
-        fileName: fields.username,
-        saveTo: toProfilePath,
+      const existingUser = await User.findOne({
+        where: [{ username: fields.username, email: fields.email }],
       });
-      if (!success) {
-        return {
-          message,
-          success: false,
-        };
+      if (existingUser) throw new Error("You already have been registered");
+
+      const hashPassword = await argon2.hash(fields.password);
+
+      const user = await User.create({
+        ...fields,
+        password: hashPassword,
+      });
+
+      if (picture) {
+        const url = await new ProfilePictureStorage({
+          name: fields.username,
+          file: picture,
+        }).save();
+        user.picture = url;
       }
-      user.picture = url as string;
+
+      await qr.manager.save(user);
+
+      await qr.commitTransaction();
+
+      return { success: true };
+    } catch (e) {
+      await qr.rollbackTransaction();
+
+      return {
+        success: false,
+        message: e.message,
+      };
+    } finally {
+      qr.release();
     }
-
-    await user.save();
-
-    return { success: true };
   }
 
   @Mutation(() => MeResponse)

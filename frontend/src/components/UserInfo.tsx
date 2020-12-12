@@ -8,6 +8,7 @@ import React from "react";
 import { useMeQuery, useUserQuery } from "../generated/graphql";
 import { withRouter } from "next/router";
 import { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 const { Meta } = Card;
 
 const URL =
@@ -41,8 +42,10 @@ const UserInfo = ({ router }: WithRouterProps) => {
         me?.me && me?.me?.username === router.query.user
           ? [
               <SettingOutlined
+                onClick={() => {
+                  router.push(`/[user]/config`, `/${me.me?.username}/config`);
+                }}
                 key="setting"
-                onClick={() => router.push(`/${me.me?.username}/config`)}
               />,
               <EditOutlined key="edit" />,
               <EllipsisOutlined key="ellipsis" />,

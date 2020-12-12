@@ -20,8 +20,8 @@ import {
   UserReactionsResponse,
 } from "../types/Responses";
 
-import { MyContext } from "../types";
-import { toMethPath } from "../constants";
+import { MyContext, Upload } from "../types";
+import { toMertPath } from "../constants";
 import { extension } from "../utils/fileExtension";
 import { getManager, LessThan, ObjectLiteral } from "typeorm";
 import validator from "validator";
@@ -30,6 +30,9 @@ import { CreateMertInput } from "../types/Inputs";
 import { Reactions } from "../types/Common";
 import { saveFile } from "../utils/saveFile";
 import { toggleLikes } from "./MertHerlpers/toggleLikes";
+import { storeMertRedis } from "./MertHerlpers/storeRedis";
+import { GraphQLUpload } from "graphql-upload";
+import { MertPictureStorage } from "../models/ImageStorage";
 
 @Resolver(Mert)
 export class MertsResolver {
@@ -42,7 +45,9 @@ export class MertsResolver {
   @Mutation(() => MertCreationResponse)
   async createMert(
     @Arg("fields") fields: CreateMertInput,
-    @Ctx() { req, redis }: MyContext,
+    @Arg("mertPicture", () => GraphQLUpload, { nullable: true })
+    mertPicture: Upload,
+    @Ctx() { req, redis, db }: MyContext,
     @PubSub() pubSub: PubSubEngine
   ): Promise<MertCreationResponse> {
     const errors = new CreateMertInput(fields).validate();
@@ -52,62 +57,49 @@ export class MertsResolver {
         message: "Validation error",
         success: false,
       };
-    let mert: Mert;
+
+    const queryRunner = db.createQueryRunner();
+    await queryRunner.startTransaction();
     try {
-      mert = await getManager().transaction(async (_) => {
-        mert = await _.create(Mert, {
-          mert: fields.mert,
-          fatherId: fields.fatherId,
-          userId: req.session.userId,
-          createdAt: new Date().toISOString(),
-          likes: [],
-          dislikes: [],
-        }).save();
-
-        if (fields.picture) {
-          const isValidPicture = await validateImage(fields.picture);
-          if (!isValidPicture) throw new Error("Invalid file");
-          const { url, success, message } = await saveFile({
-            file: fields.picture,
-            fileKind: "merts",
-            fileName: mert.id,
-            saveTo: toMethPath,
-          });
-          if (!success) throw new Error(message);
-
-          mert.picture = url;
-          await mert.save();
-        }
-        return mert;
+      const mert = await Mert.create({
+        mert: fields.mert,
+        fatherId: fields.fatherId,
+        userId: req.session.userId,
+        createdAt: new Date().toISOString(),
+        likes: [],
+        dislikes: [],
       });
+
+      await queryRunner.manager.save(mert);
+
+      if (mertPicture) {
+        const url = await new MertPictureStorage({
+          file: mertPicture,
+          name: mert.id,
+        }).save();
+        mert.picture = url;
+        await queryRunner.manager.save(mert);
+      }
+
+      await queryRunner.commitTransaction();
+
+      const mertCreated = (await Mert.findOne(mert.id, {
+        relations: ["user"],
+      })) as Mert;
+
+      await storeMertRedis(mertCreated, redis);
+      await pubSub.publish("MERTS", mertCreated);
+
+      return { mert: mertCreated, success: true };
     } catch (e) {
+      await queryRunner.rollbackTransaction();
       return {
         success: false,
         message: e.message,
       };
+    } finally {
+      await queryRunner.release();
     }
-    if (!mert)
-      return {
-        success: false,
-        message: "Mert not found",
-      };
-
-    const mertCreated = await Mert.findOne(mert.id, { relations: ["user"] });
-    if (mertCreated?.father) {
-      await redis.lpush(mertCreated.father.id, JSON.stringify(mertCreated));
-    } else {
-      await redis.lpush("merts", JSON.stringify(mertCreated));
-      await pubSub.publish("MERTS", mertCreated);
-    }
-
-    if (!mert) {
-      return {
-        success: false,
-        message: "Sorry we cannot create the mert :(",
-      };
-    }
-
-    return { mert: mertCreated, success: true };
   }
 
   @Query(() => Mert, { nullable: true })
@@ -218,10 +210,7 @@ export class MertsResolver {
   }
 
   @Subscription(() => Mert, { topics: "MERTS", nullable: true })
-  newMert(@Root() mert: Mert, @Ctx() { req }: MyContext): Mert | null {
-    if (!mert || mert.user?.id === req.session.id) {
-      return null;
-    }
+  newMert(@Root() mert: Mert): Mert {
     return mert;
   }
 }

@@ -1,11 +1,10 @@
 import { Upload } from "../types";
 import { extension } from "./fileExtension";
+import fs from "fs";
 
 export const validateImage = async (image: Upload) => {
-  await image;
-
-  if (!image) return Promise.resolve(false);
-  const ext = extension(image?.filename || "");
+  if (!image) throw new Error("Image not found.");
+  const ext = extension(image.filename || "");
   const isValidExtension = ext === ".png" || ext === ".jpg" || ext === ".jpeg";
-  return Promise.resolve(isValidExtension);
+  if (!isValidExtension) throw new Error("This is not a image.");
 };

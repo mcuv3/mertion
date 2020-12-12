@@ -74,13 +74,8 @@ const SingUp = () => {
   );
 
   return (
-    <div style={{ width: "100%", margin: "auto" }}>
-      <div
-        style={{
-          width: "10%",
-          margin: "1rem auto",
-        }}
-      >
+    <div className="fullWidth auto">
+      <div className="signUpAvatar">
         <Upload
           name="avatar"
           listType="picture-card"

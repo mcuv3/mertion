@@ -1,7 +1,6 @@
 import { UpCircleOutlined } from "@ant-design/icons";
-import { useApolloClient } from "@apollo/client";
 import { BackTop } from "antd";
-import React, { useEffect } from "react";
+import React from "react";
 import { CreateMert } from "../components/CreateMert";
 import MainPost from "../components/Mert";
 import {
@@ -29,12 +28,29 @@ const style: React.CSSProperties = {
 
 const Home = () => {
   useIsAuth();
-  const { data: newMert, loading: loadNewMerts } = useNewMertSubscription();
-  const client = useApolloClient();
-  const { data, loading } = useMeQuery();
   const { data: res, fetchMore, loading: loadingMerts } = useMertsQuery({
     variables: { cursor: null, mertId: null },
     notifyOnNetworkStatusChange: true,
+  });
+  const { data, loading } = useMeQuery();
+
+  useNewMertSubscription({
+    onSubscriptionData: ({ client, subscriptionData }) => {
+      const mert = subscriptionData.data?.newMert;
+      const currentUserId = data?.me?.id;
+
+      if (mert && mert.user.id !== currentUserId)
+        client.cache.writeQuery<MertsQuery>({
+          query: MertsDocument,
+          variables: { cursor: null, mertId: null },
+          data: {
+            merts: {
+              hasMore: Boolean(res?.merts?.hasMore),
+              merts: [mert],
+            },
+          },
+        });
+    },
   });
 
   useScroll({
@@ -55,28 +71,8 @@ const Home = () => {
     }
   }
 
-  useEffect(() => {
-    if (
-      newMert &&
-      !loadNewMerts &&
-      newMert?.newMert?.user?.username !== data?.me?.username &&
-      res?.merts?.merts
-    ) {
-      client.cache.writeQuery<MertsQuery>({
-        query: MertsDocument,
-        variables: { cursor: null, mertId: null },
-        data: {
-          merts: {
-            hasMore: res.merts.hasMore,
-            merts: [newMert.newMert as Mert, ...(res?.merts?.merts || [])],
-          },
-        },
-      });
-    }
-  }, [newMert]);
-
   return (
-    <div style={{ width: "100%" }}>
+    <div className="fullWidth">
       <BackTop style={style}>
         <UpCircleOutlined />
       </BackTop>

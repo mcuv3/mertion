@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { Card, Comment, Space, Tooltip } from "antd";
-import dayjs from "../util/dayjs";
+import { gql, useApolloClient } from "@apollo/client";
+import { Card, Comment, Tooltip } from "antd";
 import Image from "next/image";
-
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { checkAction } from "../common/checkAction";
 import {
   Mert,
   Reactions,
   useMeQuery,
   useReactMertMutation,
 } from "../generated/graphql";
-import { useRouter } from "next/router";
+import { isAuth } from "../util/checkAuth";
+import dayjs from "../util/dayjs";
 import Actions from "./Actions";
 import Reply from "./Reply";
-import { isAuth } from "../util/checkAuth";
-import { checkAction } from "../common/checkAction";
-import { gql, useApolloClient } from "@apollo/client";
 
 const __prod__ = process.env.NODE_ENV === "production";
 

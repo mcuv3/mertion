@@ -8,6 +8,10 @@ import { saveFile } from "../utils/saveFile";
 import { UserUpdatedResponse } from "../types/Responses";
 import { validateImage } from "../utils/validateImage";
 import { extension } from "../utils/fileExtension";
+import {
+  BackgroundPictureStorage,
+  ProfilePictureStorage,
+} from "../models/ImageStorage";
 
 @Resolver()
 export class UserResolver {
@@ -26,69 +30,45 @@ export class UserResolver {
     if (errors.length > 0)
       return { errors, message: "Validation errors", success: false };
 
-    const updates: Partial<User> = {
-      username: fields.username,
-      name: fields.name,
-      about: fields.about,
-      age: fields.age,
-    };
+    try {
+      const updates: Partial<User> = {
+        username: fields.username,
+        name: fields.name,
+        about: fields.about,
+        age: fields.age,
+      };
 
-    if (picture) {
-      const isValidImage = validateImage(picture);
-      if (!isValidImage) {
-        return {
-          success: false,
-          message: "Invalid image file",
-        };
+      if (picture) {
+        const url = await new ProfilePictureStorage({
+          file: picture,
+          name: req.session.username,
+          oldName: req.session.username + extension(req.session.picture),
+        }).save();
+        updates["picture"] = url;
       }
 
-      const { success, message, url } = await saveFile({
-        file: picture,
-        fileKind: "profile-pictures",
-        fileName: req.session.username,
-        saveTo: toProfilePath,
-        oldName: req.session.username + extension(req.session.picture),
-      });
-
-      if (!success)
-        return {
-          success,
-          message,
-        };
-      updates["picture"] = url;
-    }
-
-    if (pictureBg) {
-      const isValidImage = validateImage(pictureBg);
-      if (!isValidImage) {
-        return {
-          success: false,
-          message: "Invalid image file",
-        };
+      if (pictureBg) {
+        const url = await new BackgroundPictureStorage({
+          file: pictureBg,
+          name: req.session.username,
+          oldName: req.session.username + extension(req.session.bgPicture),
+        }).save();
+        updates["backgroundPicture"] = url;
       }
-      const { success, message, url } = await saveFile({
-        file: pictureBg,
-        fileKind: "backgrounds",
-        fileName: req.session.username,
-        saveTo: toBackgroundsPath,
-        oldName: req.session.username + extension(req.session.bgPicture),
-      });
 
-      if (!success)
-        return {
-          success,
-          message,
-        };
-      updates["backgroundPicture"] = url;
+      await User.update(req.session.userId, updates);
+
+      return {
+        success: true,
+        message: "Updated Successfully",
+        backgroundImageUrl: updates["backgroundPicture"],
+        picture: updates["picture"],
+      };
+    } catch (e) {
+      return {
+        success: false,
+        message: e.message,
+      };
     }
-
-    await User.update(req.session.userId, updates);
-
-    return {
-      success: true,
-      message: "Updated Successfully",
-      backgroundImageUrl: updates["backgroundPicture"],
-      picture: updates["picture"],
-    };
   }
 }
