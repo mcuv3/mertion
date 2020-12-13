@@ -14,27 +14,33 @@ import { withApollo } from "../lib/withApollo";
 import { useApolloClient } from "@apollo/client";
 const { Content, Footer, Header } = Layout;
 const { Title } = Typography;
+import { Grid, Tag } from "antd";
+
+const { useBreakpoint } = Grid;
 
 const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const router = useRouter();
   const client = useApolloClient();
   const { data, loading } = useMeQuery();
   const [logout] = useLogOutMutation();
-
+  const br = useBreakpoint();
   const logOut = async () => {
     await logout();
     client.cache.evict({});
     router.push("/");
   };
 
+  console.log(br);
+
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ minHeight: "100vh", width: "100%" }}>
       <Header
         className="header"
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          width: "100%",
         }}
       >
         <Link passHref href="/">
@@ -92,7 +98,10 @@ const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
           padding: "2rem",
           flex: "1",
           margin: "auto",
-          width: "720px",
+          width:
+            (!br.md && br.sm) || (!br.md && br.sm) || (!br.sm && !br.md)
+              ? "100%"
+              : "768px",
           minHeight: "100vh",
           display: "flex",
         }}
