@@ -7,8 +7,7 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { createUploadLink } from "apollo-upload-client";
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import { MertsResponse } from "../generated/graphql";
-
-const __server__ = typeof window === "undefined";
+import { __server__ } from "../util/isServer";
 
 let URI = __server__ ? process.env.SERVER_URL : process.env.NEXT_PUBLIC_API_URL;
 let URI_SW = __server__
