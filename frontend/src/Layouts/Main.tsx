@@ -1,20 +1,18 @@
-import { Breadcrumb, Layout, Menu, Button, Typography } from "antd";
 import {
-  UserOutlined,
+  LogoutOutlined,
   RadarChartOutlined,
   UsergroupAddOutlined,
-  LogoutOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import { useApolloClient } from "@apollo/client";
+import { Button, Grid, Layout, Typography } from "antd";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { PropsWithChildren } from "react";
-
-import Link from "next/link";
 import { useLogOutMutation, useMeQuery } from "../generated/graphql";
-import { withApollo } from "../lib/withApollo";
-import { useApolloClient } from "@apollo/client";
+
 const { Content, Footer, Header } = Layout;
 const { Title } = Typography;
-import { Grid, Tag } from "antd";
 
 const { useBreakpoint } = Grid;
 
@@ -30,7 +28,7 @@ const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     router.push("/");
   };
 
-  console.log(br);
+  // console.log(br);
 
   return (
     <Layout style={{ minHeight: "100vh", width: "100%" }}>

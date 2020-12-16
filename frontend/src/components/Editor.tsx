@@ -2,18 +2,17 @@ import { Button, Tooltip } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import React, { useEffect, useState } from "react";
 import { PictureOutlined, SmileOutlined } from "@ant-design/icons";
-import { __server__ } from "../util/isServer";
+import { __server__ } from "../util/constants";
 import {} from "next";
 import { IEmojiData, IEmojiPickerProps } from "emoji-picker-react";
-// import Picker, { SKIN_TONE_MEDIUM_DARK } from "emoji-picker-react";
+import { ImagePreview } from "./ImagePreview";
 let Picker: any;
 
 interface Props {
-  onSubmit?: (val: string) => void;
+  onSubmit: (val: string) => void;
+  cancelReply?: () => void;
   loading: boolean;
   isReply?: boolean;
-  change?: (val: string) => void;
-  valueReply?: string;
   setWithImage: () => void;
   success?: boolean;
 }
@@ -22,24 +21,23 @@ export const Editor = ({
   loading,
   onSubmit,
   isReply = false,
-  change,
-  valueReply,
+  cancelReply,
   setWithImage,
   success,
 }: Props) => {
   const [value, setValue] = useState("");
-
-  const submit = () => onSubmit && onSubmit(value);
   const [Emoji, setEmoji] = useState<any>();
   const [showEmoji, setShowEmoji] = useState(false);
 
   useEffect(() => {
-    if (success && !loading) setValue("");
+    if (success && !loading) {
+      setShowEmoji(false);
+      setValue("");
+    }
   }, [success, loading]);
 
-  const addrEmojiHandler = (event: MouseEvent, data: IEmojiData) => {
+  const addEmojiHandler = (_: MouseEvent, data: IEmojiData) =>
     setValue((text) => text + data.emoji);
-  };
 
   useEffect(() => {
     if (process.browser) {
@@ -48,7 +46,7 @@ export const Editor = ({
         setEmoji(
           <pic.default
             disableSearchBar
-            onEmojiClick={addrEmojiHandler}
+            onEmojiClick={addEmojiHandler}
             disableAutoFocus={true}
             skinTone={pic.SKIN_TONE_MEDIUM_DARK}
             groupNames={{ smileys_people: "PEOPLE" }}
@@ -62,11 +60,8 @@ export const Editor = ({
     <div>
       <>
         <TextArea
-          value={isReply ? valueReply : value}
-          onChange={(e) => {
-            if (isReply && change) change(e.target.value);
-            else setValue(e.target.value);
-          }}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
           rows={3}
           placeholder="Share your gains"
         />
@@ -87,25 +82,39 @@ export const Editor = ({
             />
           </Tooltip>
 
-          <Tooltip key="comment-basic-like-2" title="picture">
-            <PictureOutlined
-              style={{ fontSize: "1.5rem" }}
-              onClick={() => setWithImage()}
-            />
-          </Tooltip>
-          {/* {withImage && <ImagePreview />} */}
+          {!isReply && (
+            <Tooltip key="comment-basic-like-2" title="picture">
+              <PictureOutlined
+                style={{ fontSize: "1.5rem" }}
+                onClick={() => setWithImage()}
+              />
+            </Tooltip>
+          )}
         </div>
-        {!isReply && (
+        <div>
+          {isReply && (
+            <Button
+              size="middle"
+              htmlType="submit"
+              loading={loading}
+              onClick={cancelReply}
+              type="primary"
+              danger
+              style={{ marginRight: "0.5rem" }}
+            >
+              Cancel
+            </Button>
+          )}
           <Button
             size="middle"
             htmlType="submit"
             loading={loading}
-            onClick={submit}
+            onClick={() => onSubmit(value)}
             type="primary"
           >
-            mert
+            {isReply ? "Reply" : "Mert"}
           </Button>
-        )}
+        </div>
       </div>
     </div>
   );

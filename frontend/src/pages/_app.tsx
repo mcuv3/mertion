@@ -4,14 +4,13 @@ import NextNprogress from "nextjs-progressbar";
 import { DefaultSeo } from "next-seo";
 import seoConfig from "../../seo.config";
 import { withApollo } from "../lib/withApollo";
+
 function MyApp({ Component, pageProps }: any) {
   return (
     <Main>
       <NextNprogress options={{ easing: "ease", speed: 500 }} />
-      {/* <DefaultSeo  {...seoConfig}> */}
-
+      <DefaultSeo {...seoConfig} />
       <Component {...pageProps} />
-      {/* </DefaultSeo> */}
     </Main>
   );
 }

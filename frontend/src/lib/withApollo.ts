@@ -7,7 +7,7 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { createUploadLink } from "apollo-upload-client";
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import { MertsResponse } from "../generated/graphql";
-import { __server__ } from "../util/isServer";
+import { __server__ } from "../util/constants";
 
 let URI = __server__ ? process.env.SERVER_URL : process.env.NEXT_PUBLIC_API_URL;
 let URI_SW = __server__
@@ -89,6 +89,11 @@ const createClient = (ctx?: NextPageContext) => {
                   hasMore: older.hasMore,
                   merts: [...newer.merts, ...older.merts],
                 };
+              },
+            },
+            mertsById: {
+              merge(_, newer) {
+                return newer;
               },
             },
           },

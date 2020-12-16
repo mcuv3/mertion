@@ -1,0 +1,5 @@
+query mertsById($mertIds: [String!]!) {
+  mertsById(mertIds: $mertIds) {
+    ...BaseMert
+  }
+}

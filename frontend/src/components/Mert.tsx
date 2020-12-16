@@ -11,11 +11,10 @@ import {
   useReactMertMutation,
 } from "../generated/graphql";
 import { isAuth } from "../util/checkAuth";
+import { __prod__ } from "../util/constants";
 import dayjs from "../util/dayjs";
 import Actions from "./Actions";
 import Reply from "./Reply";
-
-const __prod__ = process.env.NODE_ENV === "production";
 
 interface Props {
   mert: Mert;
@@ -88,7 +87,6 @@ const MertComponent: React.FC<Props> = ({
                 `/[user]/[mert]`,
                 `/${mert.user.username}/${mert.id}`
               );
-            // if (isFather && !fromUserMert) return;
             if (fromUserMert && addFather) return addFather(mert);
           }}
         >
@@ -121,7 +119,6 @@ const MertComponent: React.FC<Props> = ({
             content={
               <>
                 <p style={{ marginBottom: "1rem" }}>{mert.mert}</p>
-
                 <div>
                   {mert.picture && (
                     <div className="mertImage">

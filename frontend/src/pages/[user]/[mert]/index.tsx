@@ -2,11 +2,13 @@ import { withApollo } from "../../../lib/withApollo";
 import {
   Mert,
   useMertQuery,
+  useMertsByIdLazyQuery,
+  useMertsByIdQuery,
   useMertsLazyQuery,
   useMertsQuery,
 } from "../../../generated/graphql";
 import { NextRouter, useRouter } from "next/router";
-import MainPost from "../../../components/Mert";
+import MertPost from "../../../components/Mert";
 import React, { useEffect, useState } from "react";
 import NotFound from "../../../components/404";
 import { Spin } from "antd";
@@ -16,46 +18,53 @@ const getMertId = (router: NextRouter) =>
 
 const UserMert = () => {
   const router = useRouter();
-  const [fathers, setFathers] = useState<Set<string | undefined>>(new Set());
-  const { data: father } = useMertQuery({
+  const [_, setFathers] = useState<Set<string>>(
+    new Set([getMertId(router) as string])
+  );
+
+  const [
+    fetchFathers,
+    { data: fatherMerts, loading: loadingFathers },
+  ] = useMertsByIdLazyQuery({
     variables: {
-      mertId: getMertId(router),
+      mertIds: [getMertId(router) as string],
     },
   });
 
-  const { data: fathersMerts } = useMertsQuery({
-    variables: {
-      mertId: getMertId(router),
-      cursor: null,
-    },
-  });
-
-  const [fetch, { data: nestedMerts }] = useMertsLazyQuery();
+  const [fetchChildren, { data: nestedMerts }] = useMertsLazyQuery();
 
   useEffect(() => {
-    if (father?.mert) setFathers((f) => f.add(father?.mert?.id));
-    fetch({
+    fetchFathers({
+      variables: {
+        mertIds: [getMertId(router) as string],
+      },
+    });
+    fetchChildren({
       variables: {
         cursor: null,
         mertId: getMertId(router),
       },
     });
-  }, [father]);
+  }, []);
 
-  const addFatherHandler = (mert: Mert) => {
+  const addFatherHandler = (mert: Mert, isFather = false) => {
     setFathers((fathers) => {
-      const isInFathers = fathers.has(mert.id);
-      if (isInFathers) {
-        const arr = Array.from(fathers);
+      let arr = Array.from(fathers);
+      if (isFather) {
         const index = arr.findIndex((e) => e === mert.id);
-        arr.slice(0, index + 1);
-        return new Set(arr);
-      }
+        arr = arr.slice(0, index + 1);
+      } else arr.push(mert.id);
 
-      const newFathers = fathers.add(mert.id);
-      return newFathers;
+      fetchFathers({
+        variables: {
+          mertIds: arr,
+        },
+      });
+
+      return new Set(arr);
     });
-    fetch({
+
+    fetchChildren({
       variables: {
         cursor: null,
         mertId: mert.id,
@@ -63,37 +72,25 @@ const UserMert = () => {
     });
   };
 
-  if (!father?.mert)
+  if (!loadingFathers && fatherMerts?.mertsById.length === 0)
     return <Spin style={{ textAlign: "center", margin: "auto" }} />;
 
   return (
-    <div style={{ width: "100%" }}>
-      <div>
-        <MainPost
-          key={father.mert.id}
-          mert={father.mert as Mert}
-          isFather
-          fromUserMert
-          addFather={addFatherHandler}
-        />
-        {fathersMerts?.merts?.merts.map((father) => {
-          if (fathers.has(father.id))
-            return (
-              <MainPost
-                key={father.id}
-                mert={father as Mert}
-                isFather
-                fromUserMert
-                addFather={addFatherHandler}
-              />
-            );
-
-          return null;
-        })}
-      </div>
+    <div className="fullWidth">
+      {fatherMerts?.mertsById.map((father, index) => {
+        return (
+          <MertPost
+            key={father.id}
+            mert={father as Mert}
+            isFather
+            fromUserMert
+            addFather={(mert) => addFatherHandler(mert, true)}
+          />
+        );
+      })}
       {nestedMerts?.merts?.merts.map((m) => {
         return (
-          <MainPost
+          <MertPost
             fromUserMert
             mert={m as Mert}
             key={m.id}

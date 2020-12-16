@@ -12,6 +12,8 @@ COPY . .
 
 EXPOSE 4000
 
+VOLUME [ "/app/src/public" ]
+
 
 # COPY .env.production .env
 

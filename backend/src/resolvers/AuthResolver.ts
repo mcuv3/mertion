@@ -65,7 +65,7 @@ export class Auth {
       await qr.startTransaction();
 
       const existingUser = await User.findOne({
-        where: [{ username: fields.username, email: fields.email }],
+        where: [{ username: fields.username }, { email: fields.email }],
       });
       if (existingUser) throw new Error("You already have been registered");
 

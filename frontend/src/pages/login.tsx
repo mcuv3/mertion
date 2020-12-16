@@ -1,8 +1,9 @@
 import { useRouter } from "next/router";
 import { Form, Input, Button, Checkbox } from "antd";
-
+import { Typography } from "antd";
 import { withApollo } from "../lib/withApollo";
 import { useFormErrors } from "../hooks/useFormErrors";
+import { RadarChartOutlined } from "@ant-design/icons";
 import {
   LoginMutationVariables,
   MeDocument,
@@ -10,6 +11,7 @@ import {
   useLoginMutation,
 } from "../generated/graphql";
 
+const { Title } = Typography;
 const layout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
@@ -55,6 +57,12 @@ const Login = () => {
 
   return (
     <div className="fullWidth auto">
+      <div className="loginLogoContainer">
+        <RadarChartOutlined className="loginLogo" />
+        <Title className="loginTitle" level={2}>
+          Mertion
+        </Title>
+      </div>
       <Form
         {...layout}
         form={form}

@@ -209,6 +209,16 @@ export class MertsResolver {
     };
   }
 
+  @Query(() => [Mert])
+  async mertsById(@Arg("mertIds", () => [String]) mertIds: string[]) {
+    return Mert.findByIds(mertIds, {
+      relations: ["user"],
+      order: {
+        createdAt: "ASC",
+      },
+    });
+  }
+
   @Subscription(() => Mert, { topics: "MERTS", nullable: true })
   newMert(@Root() mert: Mert): Mert {
     return mert;

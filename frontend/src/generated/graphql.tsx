@@ -27,6 +27,7 @@ export type Query = {
   mert?: Maybe<Mert>;
   merts?: Maybe<MertsResponse>;
   usersReactions: UserReactionsResponse;
+  mertsById: Array<Mert>;
 };
 
 export type QueryUserArgs = {
@@ -45,6 +46,10 @@ export type QueryMertsArgs = {
 export type QueryUsersReactionsArgs = {
   reaction: Reactions;
   mertId: Scalars["String"];
+};
+
+export type QueryMertsByIdArgs = {
+  mertIds: Array<Scalars["String"]>;
 };
 
 export type MeResponse = {
@@ -395,6 +400,14 @@ export type MertsQuery = { __typename?: "Query" } & {
         merts: Array<{ __typename?: "Mert" } & BaseMertFragment>;
       }
   >;
+};
+
+export type MertsByIdQueryVariables = Exact<{
+  mertIds: Array<Scalars["String"]>;
+}>;
+
+export type MertsByIdQuery = { __typename?: "Query" } & {
+  mertsById: Array<{ __typename?: "Mert" } & BaseMertFragment>;
 };
 
 export type UserQueryVariables = Exact<{
@@ -968,6 +981,58 @@ export type MertsLazyQueryHookResult = ReturnType<typeof useMertsLazyQuery>;
 export type MertsQueryResult = Apollo.QueryResult<
   MertsQuery,
   MertsQueryVariables
+>;
+export const MertsByIdDocument = gql`
+  query mertsById($mertIds: [String!]!) {
+    mertsById(mertIds: $mertIds) {
+      ...BaseMert
+    }
+  }
+  ${BaseMertFragmentDoc}
+`;
+
+/**
+ * __useMertsByIdQuery__
+ *
+ * To run a query within a React component, call `useMertsByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMertsByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useMertsByIdQuery({
+ *   variables: {
+ *      mertIds: // value for 'mertIds'
+ *   },
+ * });
+ */
+export function useMertsByIdQuery(
+  baseOptions: Apollo.QueryHookOptions<MertsByIdQuery, MertsByIdQueryVariables>
+) {
+  return Apollo.useQuery<MertsByIdQuery, MertsByIdQueryVariables>(
+    MertsByIdDocument,
+    baseOptions
+  );
+}
+export function useMertsByIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    MertsByIdQuery,
+    MertsByIdQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<MertsByIdQuery, MertsByIdQueryVariables>(
+    MertsByIdDocument,
+    baseOptions
+  );
+}
+export type MertsByIdQueryHookResult = ReturnType<typeof useMertsByIdQuery>;
+export type MertsByIdLazyQueryHookResult = ReturnType<
+  typeof useMertsByIdLazyQuery
+>;
+export type MertsByIdQueryResult = Apollo.QueryResult<
+  MertsByIdQuery,
+  MertsByIdQueryVariables
 >;
 export const UserDocument = gql`
   query User($username: String) {

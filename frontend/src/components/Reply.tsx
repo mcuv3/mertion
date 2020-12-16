@@ -15,11 +15,11 @@ interface Props {
 const Reply = ({ fatherMert, close }: Props) => {
   const { data: me } = useMeQuery();
 
-  const [mert, setMert] = useState("");
   const [createMert, { loading }] = useCreateMertMutation({
     update: updateCreateMert(fatherMert?.id),
   });
-  const create = async () => {
+  const create = async (mert = "") => {
+    if (!mert) return;
     const res = await createMert({
       variables: {
         mert,
@@ -36,8 +36,10 @@ const Reply = ({ fatherMert, close }: Props) => {
       style={{ position: "relative" }}
       title={`Reply to ${fatherMert.user.username}`}
       visible
-      onOk={create}
+      onOk={() => create()}
       onCancel={close.bind(this, false)}
+      okText="Reply"
+      footer={[]}
     >
       <div
         style={{
@@ -66,10 +68,9 @@ const Reply = ({ fatherMert, close }: Props) => {
         }
         content={
           <Editor
-            valueReply={mert}
             loading={loading}
             onSubmit={create}
-            change={(val) => setMert(val)}
+            cancelReply={close.bind(null, false)}
             isReply
             setWithImage={() => {}}
           />
