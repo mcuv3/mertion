@@ -18,14 +18,23 @@
 // major shadow for layers
 .mertImage {
   width: 100%;
-  background-color: transparent;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  justify-content: center;
-  align-items: center;
-  height: 600px;
+  height: 400px;
   display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-radius: 25px;
+  transition-duration: 0.3s;
+  transform: perspective(1px) translateZ(0);
+  transition-duration: 0.3s;
+  transition-property: box-shadow;
+  box-sizing: border-box;
+  box-shadow: 0 0 0 3px #188fff6c, 0 0 1px rgba(0, 0, 0, 0);
+  overflow: hidden !important;
+}
+
+.mertImage:hover {
+  box-shadow: 0 0 0 3px #2098d1, 0 0 1px rgba(0, 0, 0, 0);
+  overflow: hidden;
 }
 
 .vertical_dotted_line {

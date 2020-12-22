@@ -119,20 +119,20 @@ const MertComponent: React.FC<Props> = ({
             content={
               <>
                 <p style={{ marginBottom: "1rem" }}>{mert.mert}</p>
-                <div>
-                  {mert.picture && (
-                    <div className="mertImage">
-                      <Image
-                        alt={mert.id}
-                        src={mert.picture?.replace("localhost", "app") || ""}
-                        width={400}
-                        height={500}
-                        quality={100}
-                        //sizes="(max-width: 600px) 100vw, (max-width: 1023px) 48vw, 18vw,(max-height: 500px) 1000px"
-                      />
-                    </div>
-                  )}
-                </div>
+
+                {mert.picture && (
+                  <div className="mertImage">
+                    <Image
+                      alt={mert.id}
+                      src={mert.picture?.replace("localhost", "app") || ""}
+                      quality={100}
+                      width={650}
+                      height={410}
+                      layout="fixed"
+                      objectFit="cover"
+                    />
+                  </div>
+                )}
               </>
             }
             datetime={

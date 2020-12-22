@@ -20,6 +20,7 @@ export const CreateMert: React.FC<Props> = ({
     update: updateCreateMert(fatherId),
     notifyOnNetworkStatusChange: true,
   });
+
   const [withImage, setWithImage] = useState(false);
   const [image, setImage] = useState<{ url: string; file?: Blob } | null>();
 

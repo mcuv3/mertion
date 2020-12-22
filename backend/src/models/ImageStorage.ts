@@ -6,7 +6,7 @@ import { createWriteStream, unlinkSync, existsSync } from "fs";
 enum Folder {
   Mert = "merts",
   ProfilePicture = "profile-pictures",
-  Background = "Background",
+  Background = "backgrounds",
 }
 
 interface FileKind {
