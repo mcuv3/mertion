@@ -1,35 +1,30 @@
-import { createConnection, getConnection } from "typeorm";
-import { DATABASE_URL } from "../constants";
+import { Connection, createConnection, getConnectionOptions } from "typeorm";
 import { Mert, User } from "../entities";
+
+export let db: Connection;
 
 const connection = {
   async create() {
-    await createConnection({
+    const options = await getConnectionOptions("test");
+    // console.log(options);
+    db = await createConnection({
       type: "postgres",
-      host: "localhost",
-      port: 5432,
-      username: "postgres",
-      password: "postgres",
-      database: "test",
-      dropSchema: true,
-      logging: false,
+      url: "postgresql://postgres:postgres@localhost:5432/test",
       synchronize: true,
-      entities: ["src/database/entities/*.ts"],
+      entities: [User, Mert],
     });
+    const res = await db
+      .getRepository(User)
+      .createQueryBuilder()
+      .select("*")
+      .getOne();
+    console.log(res);
   },
 
   async close() {
-    await getConnection().close();
+    // return getConnection("test").close();
   },
 
-  async clear() {
-    const connection = getConnection();
-    const entities = connection.entityMetadatas;
-
-    entities.forEach(async (entity) => {
-      const repository = connection.getRepository(entity.name);
-      await repository.query(`DELETE FROM ${entity.tableName}`);
-    });
-  },
+  async clear() {},
 };
 export default connection;

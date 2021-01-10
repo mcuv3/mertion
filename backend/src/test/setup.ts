@@ -9,5 +9,5 @@ afterAll(async () => {
 });
 
 beforeEach(async () => {
-  await connection.clear();
+  // await connection.clear();
 });

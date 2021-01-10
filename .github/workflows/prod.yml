@@ -5,7 +5,36 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  test:
+    name: Test somemodule Go code
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:10-2.5
+        env:
+          # must specify password for PG Docker container image, see: https://registry.hub.docker.com/_/postgres?tab=description&page=1&name=10
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
-      - run: echo "test"
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14.x
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Import DB seed data
+        run: psql -d postgresql://postgres@localhost/your_test_db_name -f your_seed_data.sql
+        working-directory: ./test/data
+        env:
+          PGPASSWORD: password
+      - name: Test some module
+        working-directory: ./go/somemodule
+        run: go test
+        env:
+          CI_DB_URL: postgresql://postgres:password@localhost:5432/test

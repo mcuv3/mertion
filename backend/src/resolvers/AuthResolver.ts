@@ -1,14 +1,11 @@
+import argon2 from "argon2";
+import { GraphQLUpload } from "graphql-upload";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../entities/User";
-import { MeResponse, SignUpResponse } from "../types/Responses";
-import { MyContext, Upload } from "../types";
-import { GraphQLUpload } from "graphql-upload";
-import argon2 from "argon2";
-import { toProfilePath } from "../constants";
-import { validateImage } from "../utils/validateImage";
-import { SingInInput, SingUpInput } from "../types/Inputs";
-import { saveFile } from "../utils/saveFile";
 import { ProfilePictureStorage } from "../models/ImageStorage";
+import { MyContext, Upload } from "../types";
+import { SingInInput, SingUpInput } from "../types/Inputs";
+import { MeResponse, SignUpResponse } from "../types/Responses";
 
 @Resolver()
 export class Auth {
@@ -67,6 +64,7 @@ export class Auth {
       const existingUser = await User.findOne({
         where: [{ username: fields.username }, { email: fields.email }],
       });
+      console.log(qr);
       if (existingUser) throw new Error("You already have been registered");
 
       const hashPassword = await argon2.hash(fields.password);

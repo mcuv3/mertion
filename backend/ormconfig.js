@@ -1,5 +1,5 @@
 module.exports = {
-  name: "default",
+  name: "test",
   type: "postgres",
   host: "localhost",
   port: 5432,
@@ -11,10 +11,10 @@ module.exports = {
   synchroize: true,
   migrationsRun: true,
 
-  entities: ["src/database/entities/*.ts"],
-  migrations: ["src/database/migrations/*.ts"],
+  entities: ["./src/entities/*.ts"],
+  migrations: ["src/migrations/*.ts"],
   cli: {
-    entitiesDir: "src/database/entities",
-    migrationsDir: "src/database/migrations",
+    entitiesDir: "src/entities",
+    migrationsDir: "src/migrations",
   },
 };
