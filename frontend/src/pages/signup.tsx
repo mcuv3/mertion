@@ -1,17 +1,17 @@
-import { Form, Input, InputNumber, Button, Upload } from "antd";
-import { beforeUpload, getBase64 } from "../validation/validation";
-import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-import { useCallback, useEffect, useState } from "react";
-import { withApollo } from "../lib/withApollo";
-import { useForm } from "antd/lib/form/Form";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Form, Input, InputNumber, Upload } from "antd";
 import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { Features } from "../components/Features";
 import {
   SignUpMutationVariables,
   useSignUpMutation,
 } from "../generated/graphql";
-import { useRouter } from "next/router";
 import { useFormErrors } from "../hooks/useFormErrors";
+import { withApollo } from "../lib/withApollo";
+import { beforeUpload, getBase64 } from "../validation/validation";
 
 const layout = {
   width: "100%",
@@ -74,73 +74,78 @@ const SingUp = () => {
   );
 
   return (
-    <div className="fullWidth auto">
-      <div className="signUpAvatar">
-        <Upload
-          name="avatar"
-          listType="picture-card"
-          className="avatar-uploader"
-          showUploadList={false}
-          multiple={false}
-          beforeUpload={beforeUpload}
-          onChange={handleChange}
-        >
-          {image?.url ? (
-            <img src={image?.url} alt="avatar" style={{ width: "100%" }} />
-          ) : (
-            uploadButton
-          )}
-        </Upload>
+    <div className="expanded">
+      <div className="features">
+        <Features />
       </div>
-      <Form
-        form={form}
-        {...layout}
-        name="nest-messages"
-        onFinish={onFinish}
-        validateMessages={validateMessages}
-      >
-        <Form.Item name="name" label="Full Name" rules={[{ required: true }]}>
-          <Input placeholder="Some Name ..." />
-        </Form.Item>
-        <Form.Item
-          name="email"
-          label="Email"
-          rules={[{ type: "email", required: true }]}
+      <div className="form-right">
+        <div className="signUpAvatar">
+          <Upload
+            name="avatar"
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            multiple={false}
+            beforeUpload={beforeUpload}
+            onChange={handleChange}
+          >
+            {image?.url ? (
+              <img src={image?.url} alt="avatar" style={{ width: "100%" }} />
+            ) : (
+              uploadButton
+            )}
+          </Upload>
+        </div>
+        <Form
+          form={form}
+          {...layout}
+          name="nest-messages"
+          onFinish={onFinish}
+          validateMessages={validateMessages}
         >
-          <Input placeholder="example@test.com" />
-        </Form.Item>
-        <Form.Item
-          name="password"
-          label="Password"
-          rules={[{ required: true }]}
-        >
-          <Input.Password placeholder="ej 1234." />
-        </Form.Item>
-        <Form.Item
-          name="username"
-          label="Username"
-          rules={[{ required: true }]}
-        >
-          <Input placeholder="me123" />
-        </Form.Item>
-        <Form.Item
-          name="age"
-          label="Age"
-          rules={[{ type: "number", min: 0, max: 99 }]}
-        >
-          <InputNumber />
-        </Form.Item>
+          <Form.Item name="name" label="Full Name" rules={[{ required: true }]}>
+            <Input placeholder="Some Name ..." />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[{ type: "email", required: true }]}
+          >
+            <Input placeholder="example@test.com" />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[{ required: true }]}
+          >
+            <Input.Password placeholder="ej 1234." />
+          </Form.Item>
+          <Form.Item
+            name="username"
+            label="Username"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="me123" />
+          </Form.Item>
+          <Form.Item
+            name="age"
+            label="Age"
+            rules={[{ type: "number", min: 0, max: 99 }]}
+          >
+            <InputNumber />
+          </Form.Item>
 
-        <Form.Item name="about" label="Description">
-          <Input.TextArea placeholder="About me ..." />
-        </Form.Item>
+          <Form.Item name="about" label="Description">
+            <Input.TextArea placeholder="About me ..." />
+          </Form.Item>
 
-        <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-          <Button type="primary" htmlType="submit">
-            Create Account
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
+            <Button type="primary" htmlType="submit">
+              Create Account
+            </Button>
+          </Form.Item>
+        </Form>
+      </div>
     </div>
   );
 };
