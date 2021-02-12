@@ -1,10 +1,10 @@
-import { Field, Int, ObjectType, InputType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
   Entity,
   OneToMany,
-  PrimaryGeneratedColumn,
+  PrimaryGeneratedColumn
 } from "typeorm";
 import { Mert } from "./Mert";
 
@@ -50,6 +50,15 @@ export class User extends BaseEntity {
     default: process.env.HOST_SERVER + "/backgrounds/default.jpg",
   })
   backgroundPicture?: string;
+
+  @Field(() => [String])
+  @Column("text", { default: [] })
+  followers!: string[]
+
+  @Field(() => [String])
+  @Column("text", { default: [] })
+  following!: string[]
+
 
   @OneToMany(() => Mert, (m) => m.user)
   merts!: Mert[];

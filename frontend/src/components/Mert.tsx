@@ -1,6 +1,5 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Card, Comment, Tooltip } from "antd";
-import Image from "next/image";
+import { Card, Comment } from "antd";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { checkAction } from "../common/checkAction";
@@ -11,10 +10,12 @@ import {
   useReactMertMutation,
 } from "../generated/graphql";
 import { isAuth } from "../util/checkAuth";
-import { __prod__ } from "../util/constants";
-import dayjs from "../util/dayjs";
 import Actions from "./Actions";
+import { DateMert } from "./mert/DateMert";
+import { LinkedMert } from "./mert/LinkedMert";
+import { MertContent } from "./mert/MertContent";
 import Reply from "./Reply";
+import { UserAvatar } from "./user/UserAvatar";
 
 interface Props {
   mert: Mert;
@@ -101,51 +102,23 @@ const MertComponent: React.FC<Props> = ({
             })}
             author={<a>{mert.user.username}</a>}
             avatar={
-              <Image
-                onClick={(e) => {
-                  e.stopPropagation();
-                  router.push("/[user]", `/${mert.user.username}`);
-                }}
-                width="50px"
-                height="50px"
-                src={
-                  (__prod__
-                    ? mert?.user?.picture
-                    : mert?.user?.picture?.replace("localhost", "app")) || ""
-                }
-                alt={mert.user.username || ""}
+              <UserAvatar
+                picture={mert?.user?.picture}
+                username={mert?.user?.username}
               />
             }
             content={
-              <>
-                <p style={{ marginBottom: "1rem" }}>{mert.mert}</p>
-
-                {mert.picture && (
-                  <div className="mertImage">
-                    <Image
-                      alt={mert.id}
-                      src={mert.picture?.replace("localhost", "app") || ""}
-                      quality={100}
-                      width={650}
-                      height={410}
-                      layout="fixed"
-                      objectFit="cover"
-                    />
-                  </div>
-                )}
-              </>
+              <MertContent
+                mert={mert.mert}
+                mertId={mert.id}
+                picture={mert.picture}
+              />
             }
-            datetime={
-              <Tooltip title={dayjs().from(dayjs(new Date(+mert.createdAt)))}>
-                <span>{dayjs().from(dayjs(new Date(+mert.createdAt)))}</span>
-              </Tooltip>
-            }
+            datetime={<DateMert createdAt={+mert.createdAt} />}
           />
         </div>
       </Card>
-      {isFather && mert.comments > 0 && (
-        <div className="vertical_dotted_line"></div>
-      )}
+      <LinkedMert isFather={isFather} numComments={mert.comments} />
     </>
   );
 };

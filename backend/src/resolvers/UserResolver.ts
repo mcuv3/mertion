@@ -1,17 +1,15 @@
 import { GraphQLUpload } from "graphql-upload";
 import { Arg, Authorized, Ctx, Mutation, Resolver } from "type-graphql";
-import { toBackgroundsPath, toProfilePath } from "../constants";
+import * as followController from "../controllers/followers";
 import { User } from "../entities";
-import { MyContext, Upload } from "../types";
-import { ChangeProfileInput } from "../types/Inputs";
-import { saveFile } from "../utils/saveFile";
-import { UserUpdatedResponse } from "../types/Responses";
-import { validateImage } from "../utils/validateImage";
-import { extension } from "../utils/fileExtension";
 import {
   BackgroundPictureStorage,
   ProfilePictureStorage,
 } from "../models/ImageStorage";
+import { MyContext, Upload } from "../types";
+import { ChangeProfileInput } from "../types/Inputs";
+import { UserUpdatedResponse } from "../types/Responses";
+import { extension } from "../utils/fileExtension";
 
 @Resolver()
 export class UserResolver {
@@ -70,5 +68,15 @@ export class UserResolver {
         message: e.message,
       };
     }
+  }
+
+  @Authorized()
+  @Mutation(() => Boolean)
+  async followUser(
+    @Ctx() { req }: MyContext,
+    @Arg("toFollowUserId") toFollowUserId: string
+  ) {
+    await followController.followUser(req.session.user, toFollowUserId);
+    return true;
   }
 }

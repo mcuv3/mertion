@@ -1,15 +1,11 @@
-import {
-  LogoutOutlined,
-  RadarChartOutlined,
-  UsergroupAddOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
 import { useApolloClient } from "@apollo/client";
-import { Button, Grid, Layout, Typography } from "antd";
-import Link from "next/link";
+import { Grid, Layout, Typography } from "antd";
 import { useRouter } from "next/router";
 import React, { PropsWithChildren } from "react";
+import { MertionLogo } from "../components/navigation/MertionLogo";
+import { NavigationOptions } from "../components/navigation/NavigationOptions";
 import { useLogOutMutation, useMeQuery } from "../generated/graphql";
+import styles from "../styles/navigation.module.css";
 
 const { Content, Footer, Header } = Layout;
 const { Title } = Typography;
@@ -28,68 +24,11 @@ const Main: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     router.push("/");
   };
 
-  // console.log(br);
-
   return (
     <Layout style={{ minHeight: "100vh", width: "100%" }}>
-      <Header
-        className="header"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <Link passHref href="/">
-          <div style={{ display: "flex", cursor: "pointer" }}>
-            <RadarChartOutlined
-              style={{ fontSize: "2.5rem", color: "white" }}
-            />
-            <Title
-              style={{
-                color: "white",
-                fontStyle: "italic",
-                marginTop: "1.2rem",
-              }}
-              level={5}
-            >
-              Mertion
-            </Title>
-          </div>
-        </Link>
-        {data?.me && !loading ? (
-          <Button
-            type="primary"
-            icon={<LogoutOutlined />}
-            size="large"
-            style={{ marginRight: "1rem" }}
-            onClick={logOut}
-          />
-        ) : (
-          <div className="">
-            <Button
-              type="primary"
-              icon={<UserOutlined />}
-              size="large"
-              style={{ marginRight: "1rem" }}
-              onClick={() => {
-                router.push("/login");
-              }}
-            >
-              SingIn
-            </Button>
-            <Button
-              icon={<UsergroupAddOutlined />}
-              size="large"
-              onClick={() => {
-                router.push("/signup");
-              }}
-            >
-              SignUp
-            </Button>
-          </div>
-        )}
+      <Header className={styles.header}>
+        <MertionLogo />
+        <NavigationOptions logOut={logOut} />
       </Header>
       <Content
         style={{

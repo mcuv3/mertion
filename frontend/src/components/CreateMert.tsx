@@ -1,10 +1,10 @@
-import { Avatar, Comment, message } from "antd";
-import { useRouter } from "next/router";
+import { Comment, message } from "antd";
 import React, { useState } from "react";
 import { updateCreateMert } from "../common/updateMert";
 import { MeResponse, useCreateMertMutation } from "../generated/graphql";
 import { Editor } from "./Editor";
 import { ImagePreview } from "./ImagePreview";
+import { UserAvatar } from "./user/UserAvatar";
 
 interface Props {
   me: MeResponse;
@@ -15,7 +15,6 @@ export const CreateMert: React.FC<Props> = ({
   me: { username, picture },
   fatherId,
 }) => {
-  const router = useRouter();
   const [createMert, { loading, data }] = useCreateMertMutation({
     update: updateCreateMert(fatherId),
     notifyOnNetworkStatusChange: true,
@@ -45,16 +44,7 @@ export const CreateMert: React.FC<Props> = ({
 
   return (
     <Comment
-      avatar={
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            router.push(`/${username}`);
-          }}
-        >
-          <Avatar size="large" src={picture || ""} alt={username || ""} />
-        </div>
-      }
+      avatar={<UserAvatar picture={picture || ""} username={username || ""} />}
       content={
         <>
           <Editor

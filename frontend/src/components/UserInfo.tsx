@@ -1,20 +1,20 @@
-import { Avatar, Card, Typography } from "antd";
 import {
-  SettingOutlined,
   EditOutlined,
   EllipsisOutlined,
+  SettingOutlined,
 } from "@ant-design/icons";
+import { Avatar, Card, Typography } from "antd";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
 import React from "react";
 import { useMeQuery, useUserQuery } from "../generated/graphql";
-import { withRouter } from "next/router";
-import { WithRouterProps } from "next/dist/client/with-router";
-import Link from "next/link";
+import { checkUrlImage } from "../lib/checkUrlImage";
 const { Meta } = Card;
 
 const URL =
   process.env.NODE_ENV === "production"
     ? process.env.NEXT_PUBLIC_API_URL_PRODUCTION
-    : process.env.NEXT_PUBLIC_API_URL;
+    : "http://localhost:4000/backgrounds";
 
 const UserInfo = ({ router }: WithRouterProps) => {
   const { data: user, loading } = useUserQuery({
@@ -27,15 +27,20 @@ const UserInfo = ({ router }: WithRouterProps) => {
   const { data: me } = useMeQuery();
 
   if (!user && !loading) router.push("/404");
-
   return (
     <Card
       hoverable
       style={{ width: 300 }}
       cover={
         <img
+          style={{}}
           alt="example"
-          src={user?.user?.backgroundPicture || `${URL}/default.jpg`}
+          src={
+            checkUrlImage(
+              "/backgrounds/default.jpg",
+              me?.me?.backgroundPicture as string
+            ) as string
+          }
         />
       }
       actions={

@@ -1,0 +1,28 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.logo {
+  display: flex;
+  cursor: pointer;
+  color: white;
+}
+
+.logoTitle {
+  color: white;
+  font-style: italic;
+  margin-top: 1.2rem;
+}
+.logoIcon {
+  font-size: 2.5rem;
+  color: white !important;
+}
+
+.userAuthenticated {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
